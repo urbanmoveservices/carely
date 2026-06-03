@@ -15,6 +15,7 @@ export type AppPrismaClient = PrismaClient & {
   supportTicketMessage: any;
   accessLog: any;
   qaChecklistItem: any;
+  emailOtp: any;
 };
 
 /** Fields added by multi_image_upload_pages migration (use until prisma generate) */
