@@ -9,7 +9,7 @@ import { ChatSourceCards } from "@/components/chat/ChatSourceCards";
 import type { ChatSource } from "@/components/chat/ChatSourceBadges";
 import { ChatSafetyNotice } from "@/components/chat/ChatSafetyNotice";
 import { ChatLoadingSteps } from "@/components/chat/ChatLoadingSteps";
-
+import { useTranslation } from "@/lib/i18n/use-translation";
 export type ChatAskResult = {
   answer: string;
   reply?: string;
@@ -28,26 +28,22 @@ type AssistantMeta = {
   messageId?: string;
 };
 
-function friendlyChatError(e: unknown): string {
+function friendlyChatError(e: unknown, t: (key: string) => string, tParams: (key: string, p: Record<string, string>) => string, maxChars: number): string {
   const err = e as Error & { code?: string };
-  if (err.code === "RATE_LIMITED") {
-    return "Bahut zyada messages bheje. Kuch minute wait karke try karein.";
+  if (err.code === "RATE_LIMITED" || err.code === "CHAT_RATE_LIMITED") {
+    return t("chat.errorRateLimit");
   }
   if (err.code === "CHAT_DAILY_LIMIT_REACHED" || err.code === "CHAT_LIMIT_REACHED") {
-    return err.message || "Daily chat limit reach ho gayi hai.";
-  }
-  if (err.code === "CHAT_RATE_LIMITED" || err.code === "RATE_LIMITED") {
-    return "You are sending messages too quickly. Please wait a moment.";
+    return err.message || t("chat.errorDailyLimit");
   }
   if (err.code === "AI_CHAT_NOT_CONFIGURED" || err.code === "AI_CHAT_FAILED") {
-    return "Vaidya GPT could not answer right now.";
+    return t("chat.errorGeneric");
   }
   if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError")) {
-    return "Network issue. Connection check karke dobara try karein.";
+    return t("chat.errorNetwork");
   }
-  return err.message || "Sorry, answer nahi ban paya. Dobara try karein.";
+  return err.message || t("chat.errorGeneric");
 }
-
 export function ChatWindow(props: {
   suggestions: string[];
   onSend: (
@@ -60,8 +56,8 @@ export function ChatWindow(props: {
   maxChars?: number;
   onNewChat?: () => void;
 }) {
-  const maxChars = props.maxChars ?? 2000;
-  const [messages, setMessages] = useState<ChatBubbleMessage[]>([]);
+  const { t, tParams } = useTranslation();
+  const maxChars = props.maxChars ?? 2000;  const [messages, setMessages] = useState<ChatBubbleMessage[]>([]);
   const [metaByIndex, setMetaByIndex] = useState<Record<number, AssistantMeta>>({});
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>(props.suggestions);
   const [input, setInput] = useState("");
@@ -124,10 +120,9 @@ export function ChatWindow(props: {
       const userText = text.trim();
       if (!userText || loading) return;
       if (userText.length > maxChars) {
-        setError(`Message ${maxChars} characters se chhota hona chahiye.`);
+        setError(tParams("chat.errorMaxLength", { max: String(maxChars) }));
         return;
       }
-
       setLoading(true);
       setError("");
       setFailedMessage(null);
@@ -182,9 +177,8 @@ export function ChatWindow(props: {
         }
         setFailedAssistantId(undefined);
       } catch (e) {
-        const msg = "Vaidya GPT could not answer right now.";
-        setError(friendlyChatError(e));
-        setFailedMessage(userText);
+        const msg = t("chat.errorGeneric");
+        setError(friendlyChatError(e, t, tParams, maxChars));        setFailedMessage(userText);
         const failIdx = options?.retry ? messages.length - 1 : userIdx + 1;
         const failContent = msg;
         if (options?.retry) {
@@ -210,8 +204,7 @@ export function ChatWindow(props: {
         setLoading(false);
       }
     },
-    [loading, messages.length, props, maxChars, failedAssistantId]
-  );
+    [loading, messages.length, props, maxChars, failedAssistantId, t, tParams]  );
 
   const copyLastAssistant = () => {
     const last = [...messages].reverse().find((m) => m.role === "assistant");
@@ -248,19 +241,15 @@ export function ChatWindow(props: {
                 disabled={loading}
                 onClick={() => send(failedMessage, { retry: true })}
               >
-                Retry
-              </Button>
-            )}
+                {t("chat.retry")}
+              </Button>            )}
           </div>
         )}
       </div>
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 space-y-3">
         {messages.length === 0 && !loading && (
-          <p className="text-sm text-gray-500 py-4">
-            Koi bhi health ya report sawal poochho — jawab aapke saved data se aayega.
-          </p>
-        )}
-        {messages.map((m, i) => (
+          <p className="text-sm text-gray-500 py-4">{t("chat.emptyState")}</p>
+        )}        {messages.map((m, i) => (
           <div key={`${m.role}-${i}`}>
             <ChatMessageBubble message={m} />
             {m.role === "assistant" && metaByIndex[i]?.sources && !metaByIndex[i]?.failed && (
@@ -275,9 +264,8 @@ export function ChatWindow(props: {
                 disabled={loading}
                 onClick={() => send(failedMessage, { retry: true })}
               >
-                Retry
-              </Button>
-            )}
+                {t("chat.retry")}
+              </Button>            )}
           </div>
         ))}
         {loading && <ChatLoadingSteps activeStep={loadingStep} />}
@@ -291,16 +279,15 @@ export function ChatWindow(props: {
         <div className="flex flex-wrap gap-2 mt-2 mb-1">
           {props.onNewChat && (
             <Button variant="ghost" type="button" size="sm" onClick={clearLocal} disabled={loading}>
-              New chat
+              {t("chat.newChat")}
             </Button>
           )}
           <Button variant="ghost" type="button" size="sm" onClick={copyLastAssistant} disabled={loading}>
-            Copy answer
+            {t("chat.copyAnswer")}
           </Button>
           <Button variant="ghost" type="button" size="sm" onClick={clearLocal} disabled={loading}>
-            Clear
-          </Button>
-        </div>
+            {t("chat.clear")}
+          </Button>        </div>
       </div>
       <ChatInput
         value={input}
@@ -308,8 +295,9 @@ export function ChatWindow(props: {
         onSend={() => send(input)}
         loading={loading}
         maxChars={maxChars}
-      />
-      {threadId && (
+        placeholder={t("chat.placeholder")}
+        sendLabel={t("chat.send")}
+      />      {threadId && (
         <p className="sr-only" aria-hidden>
           thread {threadId}
         </p>

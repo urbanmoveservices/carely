@@ -18,10 +18,14 @@ const DIAGNOSIS_RE =
 const PRESCRIPTION_RE =
   /prescribe|dosage|dose|kitna dose|kitni dawa|kaunsi medicine|kaun si dawa|kon si dawa|konsi dawa|which medicine|medicine lu|dawa lu|tablet lu|start taking|stop taking|change medicine|cure kare|ilaj|treatment suggest|medicine batao/i;
 
-export function classifyChatSafety(message: string): SafetyHints {
+export function classifyChatSafety(
+  message: string,
+  language: "en" | "hi" = "en"
+): SafetyHints {
   const isEmergency = EMERGENCY_RE.test(message);
   const isDiagnosisRequest = DIAGNOSIS_RE.test(message);
   const isPrescriptionRequest = PRESCRIPTION_RE.test(message);
+  const hi = language === "hi";
 
   if (isEmergency) {
     return {
@@ -30,8 +34,9 @@ export function classifyChatSafety(message: string): SafetyHints {
       isDiagnosisRequest,
       isPrescriptionRequest,
       isOutOfScope: false,
-      guidanceForModel:
-        "User may have emergency symptoms. Start answer with: Ye urgent ho sakta hai — turant emergency medical help ya doctor se contact karein (112 India). Then briefly explain what their saved report data shows if any — still do not diagnose.",
+      guidanceForModel: hi
+        ? "User may have emergency symptoms. Start answer in Hindi urging immediate emergency medical care (112 India). Then briefly explain what their saved report data shows if any — still do not prescribe."
+        : "User may have emergency symptoms. Start answer urging immediate emergency medical care (112 in India). Then briefly explain what their saved report data shows if any — still do not prescribe.",
     };
   }
 
@@ -42,8 +47,9 @@ export function classifyChatSafety(message: string): SafetyHints {
       isDiagnosisRequest,
       isPrescriptionRequest: true,
       isOutOfScope: false,
-      guidanceForModel:
-        "User asked which medicine to take and/or dosage. Do NOT prescribe or recommend medicines or doses. Explain relevant lab/report data. Mention only medicines already in saved activeMedications. Tell user to ask their doctor for treatment. Hindi/Hinglish OK.",
+      guidanceForModel: hi
+        ? "User asked about medicine or dosage. Do NOT prescribe or recommend medicines or doses. Explain relevant lab/report data. Mention only medicines already in saved activeMedications. Suggest discussing treatment with their doctor. Reply in Hindi."
+        : "User asked about medicine or dosage. Do NOT prescribe or recommend medicines or doses. Explain relevant lab/report data. Mention only medicines already in saved activeMedications. Suggest discussing treatment with their doctor. Reply in English.",
     };
   }
 
@@ -54,8 +60,9 @@ export function classifyChatSafety(message: string): SafetyHints {
       isDiagnosisRequest: true,
       isPrescriptionRequest,
       isOutOfScope: false,
-      guidanceForModel:
-        "User asked for diagnosis. Do NOT say they have a disease. Explain relevant lab values from saved data in simple language (high/low), say ye diagnosis nahi hai, doctor se confirm karna chahiye.",
+      guidanceForModel: hi
+        ? "User asked for diagnosis. Do NOT confirm a disease. Explain relevant lab values from saved data in simple Hindi (high/low vs reference)."
+        : "User asked for diagnosis. Do NOT confirm a disease. Explain relevant lab values from saved data in simple English (high/low vs reference).",
     };
   }
 
@@ -65,7 +72,8 @@ export function classifyChatSafety(message: string): SafetyHints {
     isDiagnosisRequest: false,
     isPrescriptionRequest: false,
     isOutOfScope: false,
-    guidanceForModel:
-      "Answer directly and helpfully using only saved context. Use simple Hindi/Hinglish if user writes that way.",
+    guidanceForModel: hi
+      ? "Answer directly and helpfully using only saved context. Reply entirely in Hindi."
+      : "Answer directly and helpfully using only saved context. Reply entirely in English.",
   };
 }

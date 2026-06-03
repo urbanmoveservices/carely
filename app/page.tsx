@@ -4,7 +4,6 @@ import { HomeHero } from "@/components/HomeHero";
 import {
   LandingFeatures,
   LandingHowItWorks,
-  LandingDisclaimer,
 } from "@/components/LandingSections";
 import { LandingPlans } from "@/components/LandingPlans";
 
@@ -16,7 +15,6 @@ export default function HomePage() {
       <LandingHowItWorks />
       <LandingFeatures />
       <LandingPlans />
-      <LandingDisclaimer />
       <PublicFooter />
     </div>
   );

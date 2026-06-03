@@ -349,7 +349,8 @@ export function ReportContextForm({
         </div>
         {bmi != null && (
           <p className="text-xs text-gray-500">
-            {t("reportContext.bmi")}: {bmi} ({bmiCategory(bmi)}). {t("reportContext.bmiDisclaimer")}
+            {t("reportContext.bmi")}: {bmi} ({bmiCategory(bmi)}).
+            {t("reportContext.bmiDisclaimer") ? ` ${t("reportContext.bmiDisclaimer")}` : ""}
           </p>
         )}
         <label className="block">

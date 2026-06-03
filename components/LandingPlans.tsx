@@ -5,7 +5,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 export function LandingPlans() {
   const { t } = useTranslation();
   const plans = [
-    { name: t("billing.free"), price: "₹0/mo", detail: "3 uploads · 1 AI summary" },
+    { name: t("billing.free"), price: "₹0/mo", detail: "3 uploads · 1 summary" },
     { name: t("billing.pro"), price: "₹9/mo", detail: "50 uploads · 50 AI summaries" },
     { name: t("billing.family"), price: "₹249/mo", detail: "500 uploads · caregiver sharing" },
   ];

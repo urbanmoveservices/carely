@@ -1,15 +1,14 @@
 "use client";
 
-const STEPS = [
-  "Reading saved health data",
-  "Asking Vaidya GPT",
-  "Preparing answer",
-] as const;
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export function ChatLoadingSteps({ activeStep }: { activeStep: number }) {
+  const { t } = useTranslation();
+  const steps = [t("chat.loadingStep1"), t("chat.loadingStep2"), t("chat.loadingStep3")];
+
   return (
     <div className="py-3 space-y-2" role="status" aria-live="polite">
-      {STEPS.map((label, i) => {
+      {steps.map((label, i) => {
         const done = i < activeStep;
         const current = i === activeStep;
         return (

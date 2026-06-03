@@ -243,9 +243,9 @@ function UploadContent() {
       }
 
       if (tab === "multi") {
-        setUploadPhase("Extracting text from pages (OpenAI Vision)…");
+        setUploadPhase("Reading text from pages…");
       } else {
-        setUploadPhase("Extracting text (OpenAI Vision)…");
+        setUploadPhase("Reading report text…");
       }
 
       const res = await fetch("/api/documents/upload", {
@@ -297,7 +297,7 @@ function UploadContent() {
         <div className="rounded-xl border border-brand-100 bg-brand-50/80 px-4 py-3 text-xs text-brand-800 space-y-1 mb-4">
           <p className="flex items-start gap-2">
             <Info className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>Image OCR uses OpenAI Vision (OPENAI_API_KEY required).</span>
+            <span>Image reports are read automatically for text extraction.</span>
           </p>
           <p>
             Free plan supports up to <strong>3 image pages</strong> per report.{" "}
@@ -513,7 +513,7 @@ function UploadContent() {
                     pages in correct order.
                   </p>
                   <p className="text-blue-900/80">
-                    Image OCR uses <strong>OpenAI Vision</strong> for better accuracy.
+                    Image reports are read automatically for better accuracy.
                   </p>
                 </div>
 
@@ -659,7 +659,7 @@ function UploadContent() {
             <div className="mt-5">
               <div className="flex items-start gap-2 text-xs text-gray-500 rounded-xl bg-gray-50 p-3">
                 <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-                Image OCR uses OpenAI Vision by default. Requires OPENAI_API_KEY in .env.
+                Image reports are read automatically during upload.
               </div>
             </div>
           </>

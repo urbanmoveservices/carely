@@ -683,16 +683,6 @@ function ReportContent() {
           />
         )}
 
-        {/* Disclaimer */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <div className="flex gap-3">
-            <Info className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-gray-400 leading-relaxed">
-              <strong className="text-gray-500">{t("report.medicalDisclaimerLabel")}:</strong>{" "}
-              {t("report.disclaimer")}
-            </p>
-          </div>
-        </div>
       </main>
     </div>
   );

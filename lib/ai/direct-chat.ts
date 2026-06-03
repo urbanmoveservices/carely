@@ -2,6 +2,7 @@ import { classifyChatSafety, type SafetyLevel } from "@/lib/ai/chat-safety";
 import type { ChatSourceRef } from "@/lib/ai/chat-context-builder";
 import { AiChatServiceError, isOpenAiTransientError } from "@/lib/ai/chat-errors-ai";
 import { buildChatSystemPrompt } from "@/lib/ai/chat-prompt-builder";
+import { getChatSuggestions } from "@/lib/chat/suggested-questions";
 
 export type DirectChatResult = {
   answer: string;
@@ -29,52 +30,82 @@ export class AiChatNotConfiguredError extends Error {
   }
 }
 
-function resolveLanguageInstruction(language: string, userMessage: string): string {
-  if (language === "hinglish") {
-    return "Reply in natural Hinglish (Hindi + English mix) matching the user's tone. Keep test names and numbers in English.";
-  }
+function resolveLanguageInstruction(language: string): string {
   if (language === "hi") {
-    return "Reply in Hindi (Devanagari). Keep medical test names and numeric values accurate.";
+    return "Reply entirely in Hindi (Devanagari). Keep medical test names and numeric values accurate. Do not mix English sentences.";
   }
-  if (language === "en") {
-    return "Reply in English.";
-  }
-  if (language === "app") {
-    return "Match the user's message language (Hindi, Hinglish, or English). Keep test names and values accurate.";
-  }
-  const hindiScript = /[\u0900-\u097F]/;
-  const hinglishHints = /\b(kya|hai|meri|mujhe|batao|kaun|kiski|zyada|kam|doctor|report)\b/i;
-  if (hindiScript.test(userMessage) || hinglishHints.test(userMessage)) {
-    return "Reply in Hindi or Hinglish as the user wrote. Keep test names and values accurate.";
-  }
-  return "Reply in clear simple English unless the user wrote in Hindi/Hinglish.";
+  return "Reply entirely in English. Keep medical test names and numeric values accurate.";
 }
 
-function defaultSuggestions(mode: string): string[] {
-  if (mode === "report") {
-    return [
-      "Is report me sabse important kya hai?",
-      "Kaunse values high/low hain?",
-      "Doctor se kya poochna chahiye?",
-      "Simple language me explain karo.",
-    ];
-  }
-  if (mode === "family") {
-    return [
-      "Mummy ke reports me sugar trend kya hai?",
-      "Kaunse reminders pending hain?",
-      "Family me highest risk kiska hai?",
-    ];
-  }
-  return [
-    "Meri latest report me kya important hai?",
-    "Kaunse reports AI summary ke liye pending hain?",
-    "Mere active health risks batao.",
-    "Upcoming reminders kya hain?",
-  ];
+function fallbackAnswer(language: string): string {
+  return language === "hi"
+    ? "इस सवाल के लिए मेरे पास पर्याप्त सहेजा हुआ डेटा नहीं है।"
+    : "I do not have enough saved data to answer that question yet.";
 }
 
-function parseJsonResponse(raw: string, fallbackSources: ChatSourceRef[], mode: string): DirectChatResult {
+function serviceBusyMessage(language: string): string {
+  return language === "hi"
+    ? "Vaidya GPT अभी व्यस्त है। कुछ मिनट बाद दोबारा कोशिश करें।"
+    : "Vaidya GPT is busy right now. Please try again in a few minutes.";
+}
+
+function generationFailedMessage(language: string): string {
+  return language === "hi"
+    ? "जवाब तैयार नहीं हो सका। कृपया दोबारा कोशिश करें।"
+    : "Could not prepare an answer. Please try again.";
+}
+
+function defaultSuggestions(
+  mode: "general" | "report" | "family",
+  language: string
+): string[] {
+  const t = (key: string) => {
+    const en: Record<string, string> = {
+      "chat.suggestReport1": "What's most important in this report?",
+      "chat.suggestReport2": "Which values are high or low?",
+      "chat.suggestReport3": "What should I ask my doctor?",
+      "chat.suggestReport4": "Explain this in simple terms.",
+      "chat.suggestReport5": "Do I need to see a doctor urgently?",
+      "chat.suggestFamily1": "What is the sugar trend in my mother's reports?",
+      "chat.suggestFamily2": "Who has low Vitamin D?",
+      "chat.suggestFamily3": "Which reminders are pending?",
+      "chat.suggestFamily4": "Who has the highest health risk in my family?",
+      "chat.suggestFamily5": "Which reports need follow-up?",
+      "chat.suggestGeneral1": "What's important in my latest report?",
+      "chat.suggestGeneral2": "Which reports are waiting for a summary?",
+      "chat.suggestGeneral3": "What are my active health risks?",
+      "chat.suggestGeneral4": "What reminders are coming up?",
+      "chat.suggestGeneral5": "Who in my family has the highest health risk?",
+    };
+    const hi: Record<string, string> = {
+      "chat.suggestReport1": "इस रिपोर्ट में सबसे महत्वपूर्ण क्या है?",
+      "chat.suggestReport2": "कौन से मान उच्च या निम्न हैं?",
+      "chat.suggestReport3": "मुझे डॉक्टर से क्या पूछना चाहिए?",
+      "chat.suggestReport4": "इसे सरल भाषा में समझाएं।",
+      "chat.suggestReport5": "क्या मुझे तुरंत डॉक्टर को दिखाना चाहिए?",
+      "chat.suggestFamily1": "मेरी माँ की रिपोर्ट में शुगर का रुझान क्या है?",
+      "chat.suggestFamily2": "किसकी विटामिन D कम है?",
+      "chat.suggestFamily3": "कौन से रिमाइंडर लंबित हैं?",
+      "chat.suggestFamily4": "मेरे परिवार में सबसे अधिक स्वास्थ्य जोखिम किसका है?",
+      "chat.suggestFamily5": "किन रिपोर्टों को फॉलो-अप की जरूरत है?",
+      "chat.suggestGeneral1": "मेरी नवीनतम रिपोर्ट में क्या महत्वपूर्ण है?",
+      "chat.suggestGeneral2": "कौन सी रिपोर्ट सारांश के लिए प्रतीक्षा में हैं?",
+      "chat.suggestGeneral3": "मेरे सक्रिय स्वास्थ्य जोखिम क्या हैं?",
+      "chat.suggestGeneral4": "आगामी रिमाइंडर क्या हैं?",
+      "chat.suggestGeneral5": "मेरे परिवार में सबसे अधिक स्वास्थ्य जोखिम किसका है?",
+    };
+    const dict = language === "hi" ? hi : en;
+    return dict[key] ?? en[key] ?? key;
+  };
+  return getChatSuggestions(mode, t);
+}
+
+function parseJsonResponse(
+  raw: string,
+  fallbackSources: ChatSourceRef[],
+  mode: "general" | "report" | "family",
+  language: string
+): DirectChatResult {
   let parsed: {
     answer?: string;
     safetyLevel?: SafetyLevel;
@@ -87,25 +118,24 @@ function parseJsonResponse(raw: string, fallbackSources: ChatSourceRef[], mode: 
     parsed = JSON.parse(trimmed);
   } catch {
     return {
-      answer: raw.trim() || "Mere paas is sawal ka jawab dene ke liye enough saved data nahi hai.",
+      answer: raw.trim() || fallbackAnswer(language),
       safetyLevel: "normal",
       sources: fallbackSources.slice(0, 5),
-      suggestedQuestions: defaultSuggestions(mode),
+      suggestedQuestions: defaultSuggestions(mode, language),
     };
   }
 
   return {
-    answer:
-      parsed.answer?.trim() ||
-      "Mere paas is sawal ka jawab dene ke liye enough saved data nahi hai.",
+    answer: parsed.answer?.trim() || fallbackAnswer(language),
     safetyLevel: parsed.safetyLevel || "normal",
-    sources: Array.isArray(parsed.sources) && parsed.sources.length
-      ? parsed.sources.slice(0, 8)
-      : fallbackSources.slice(0, 5),
+    sources:
+      Array.isArray(parsed.sources) && parsed.sources.length
+        ? parsed.sources.slice(0, 8)
+        : fallbackSources.slice(0, 5),
     suggestedQuestions:
       Array.isArray(parsed.suggestedQuestions) && parsed.suggestedQuestions.length
         ? parsed.suggestedQuestions.slice(0, 6)
-        : defaultSuggestions(mode),
+        : defaultSuggestions(mode, language),
   };
 }
 
@@ -120,15 +150,17 @@ export async function answerUserHealthQuestion(params: {
     throw new AiChatNotConfiguredError();
   }
 
-  const safety = classifyChatSafety(params.message);
+  const lang = params.language === "hi" ? "hi" : "en";
+  const safety = classifyChatSafety(params.message, lang);
   const fallbackSources = (params.context.sources as ChatSourceRef[] | undefined) ?? [];
-  const langInstr = resolveLanguageInstruction(params.language, params.message);
+  const langInstr = resolveLanguageInstruction(lang);
 
   const system = buildChatSystemPrompt({
     message: params.message,
     mode: params.mode,
     context: params.context,
     languageInstruction: langInstr,
+    language: lang,
   });
 
   const { default: OpenAI } = await import("openai");
@@ -154,17 +186,13 @@ export async function answerUserHealthQuestion(params: {
     });
   } catch (err) {
     if (isOpenAiTransientError(err)) {
-      throw new AiChatServiceError(
-        "Vaidya GPT abhi busy hai. Kuch minute baad dobara try karein."
-      );
+      throw new AiChatServiceError(serviceBusyMessage(lang));
     }
-    throw new AiChatServiceError(
-      "Jawab generate nahi ho paya. Dobara try karein ya baad me aayein."
-    );
+    throw new AiChatServiceError(generationFailedMessage(lang));
   }
 
   const raw = response.choices[0]?.message?.content?.trim() || "";
-  const result = parseJsonResponse(raw, fallbackSources, params.mode);
+  const result = parseJsonResponse(raw, fallbackSources, params.mode, lang);
 
   if (safety.isEmergency && result.safetyLevel !== "urgent") {
     result.safetyLevel = "urgent";

@@ -1,18 +1,21 @@
 "use client";
 
-export type ChatLanguageChoice = "app" | "en" | "hi" | "hinglish";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
-const OPTIONS: { value: ChatLanguageChoice; label: string }[] = [
-  { value: "app", label: "App language" },
-  { value: "en", label: "English" },
-  { value: "hi", label: "Hindi" },
-  { value: "hinglish", label: "Hinglish" },
+export type ChatLanguageChoice = "app" | "en" | "hi";
+
+const OPTIONS: { value: ChatLanguageChoice; labelKey: string }[] = [
+  { value: "app", labelKey: "chat.langApp" },
+  { value: "en", labelKey: "chat.langEn" },
+  { value: "hi", labelKey: "chat.langHi" },
 ];
 
 export function ChatLanguageSelector(props: {
   value: ChatLanguageChoice;
   onChange: (v: ChatLanguageChoice) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-wrap gap-1.5 mb-2">
       {OPTIONS.map((o) => (
@@ -26,7 +29,7 @@ export function ChatLanguageSelector(props: {
               : "bg-white text-gray-600 border-gray-200 hover:border-brand-300"
           }`}
         >
-          {o.label}
+          {t(o.labelKey)}
         </button>
       ))}
     </div>

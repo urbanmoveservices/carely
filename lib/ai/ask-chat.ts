@@ -97,10 +97,6 @@ function threadTypeForMode(mode: ChatAskMode): string {
 }
 
 async function resolveLanguage(userId: string, language?: string) {
-  if (language && language !== "app") {
-    if (language === "hinglish") return { code: "hinglish", name: "Hinglish" };
-    return { code: language, name: getLanguageName(language) };
-  }
   const pref = await prisma.userPreference.findUnique({
     where: { userId },
     select: { language: true },
@@ -109,8 +105,13 @@ async function resolveLanguage(userId: string, language?: string) {
     where: { id: userId },
     select: { preferredLanguage: true },
   });
-  const code = pref?.language || user?.preferredLanguage || "en";
-  return { code: language === "app" ? "app" : code, name: getLanguageName(code) };
+  const appCode = pref?.language || user?.preferredLanguage || "en";
+  const normalized = appCode === "hi" ? "hi" : "en";
+
+  if (language === "hi" || language === "en") {
+    return { code: language, name: getLanguageName(language) };
+  }
+  return { code: normalized, name: getLanguageName(normalized) };
 }
 
 async function assertChatAllowed(userId: string, email: string) {

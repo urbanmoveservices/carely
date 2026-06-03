@@ -8,9 +8,9 @@ export function ChatInput(props: {
   onSend: () => void;
   loading?: boolean;
   placeholder?: string;
+  sendLabel?: string;
   maxChars?: number;
-}) {
-  const max = props.maxChars ?? 2000;
+}) {  const max = props.maxChars ?? 2000;
   const remaining = max - props.value.length;
   const over = remaining < 0;
 
@@ -25,8 +25,7 @@ export function ChatInput(props: {
           value={props.value}
           maxLength={max + 50}
           onChange={(e) => props.onChange(e.target.value.slice(0, max))}
-          placeholder={props.placeholder ?? "Apna sawal likho…"}
-          disabled={props.loading}
+          placeholder={props.placeholder ?? "Type your question…"}          disabled={props.loading}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -41,8 +40,7 @@ export function ChatInput(props: {
           disabled={over || !props.value.trim()}
           className="shrink-0 min-h-[44px]"
         >
-          Send
-        </Button>
+          {props.sendLabel ?? "Send"}        </Button>
       </div>
       <p className={`text-[10px] mt-1 text-right ${over ? "text-red-600" : "text-gray-400"}`}>
         {props.value.length}/{max}

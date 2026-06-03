@@ -38,9 +38,8 @@ export function detectEmergencyMessage(message: string): boolean {
   return EMERGENCY_REGEX.test(message);
 }
 
-export const EMERGENCY_SAFETY_REPLY = `This may be a medical emergency. Please call your local emergency number (for example 112 in India) or go to the nearest hospital immediately. Do not wait for app advice.
-
-${CHAT_DATA_DISCLAIMER}`;
+export const EMERGENCY_SAFETY_REPLY =
+  "This may be a medical emergency. Please call your local emergency number (for example 112 in India) or go to the nearest hospital immediately.";
 
 export type ChatBotType = "report" | "family" | "support";
 
@@ -55,8 +54,7 @@ Rules:
 - If data is missing, say clearly: "I do not have that saved data yet."
 - Use simple, clear language.
 - Preserve lab values, test names, and units exactly as given.
-- Use cautious phrasing: "may need attention", "discuss with your doctor".
-- Always remind: "${CHAT_DATA_DISCLAIMER}"
+- Use cautious phrasing when values are outside reference range.
 - Do not invent values or reports not in context.
 - Never use the word "educational".
 - Reply in ${languageName} when the user writes in that language; keep medical test names and numeric values accurate.

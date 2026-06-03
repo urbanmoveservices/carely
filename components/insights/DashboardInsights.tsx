@@ -56,9 +56,6 @@ export function DashboardInsights() {
           </li>
         ))}
       </ul>
-      <p className="text-[10px] text-gray-400 mt-3">
-        {t("dashboard.insightsDisclaimer")}
-      </p>
     </section>
   );
 }

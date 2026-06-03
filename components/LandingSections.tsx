@@ -127,11 +127,13 @@ export function LandingHowItWorks() {
 
 export function LandingDisclaimer() {
   const { t } = useTranslation();
+  const text = t("landing.disclaimerShort");
+  if (!text.trim()) return null;
   return (
     <section className="py-10 bg-amber-50 border-y border-amber-100">
       <div className="mx-auto max-w-3xl px-4 text-center">
         <AlertTriangle className="h-6 w-6 text-amber-600 mx-auto mb-3" />
-        <p className="text-sm text-amber-900 leading-relaxed">{t("landing.disclaimerShort")}</p>
+        <p className="text-sm text-amber-900 leading-relaxed">{text}</p>
       </div>
     </section>
   );
@@ -193,10 +195,12 @@ export function LandingTrust() {
 
 export function LandingFooterNote() {
   const { t } = useTranslation();
+  const text = t("landing.disclaimerShort");
+  if (!text.trim()) return null;
   return (
     <section className="py-8 bg-gray-50 text-center px-4">
       <FileText className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-      <p className="text-xs text-gray-500 max-w-lg mx-auto">{t("landing.disclaimerShort")}</p>
+      <p className="text-xs text-gray-500 max-w-lg mx-auto">{text}</p>
     </section>
   );
 }

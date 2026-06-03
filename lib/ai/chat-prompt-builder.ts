@@ -15,8 +15,9 @@ export function buildChatSystemPrompt(params: {
   mode: "general" | "report" | "family";
   context: Record<string, unknown>;
   languageInstruction: string;
+  language?: "en" | "hi";
 }): string {
-  const safety = classifyChatSafety(params.message);
+  const safety = classifyChatSafety(params.message, params.language ?? "en");
   const hasData = contextHasUsableHealthData(params.context);
   const digest = buildContextDigest(params.context);
   const isReportQ = params.mode === "report" || REPORT_IMPORTANCE_RE.test(params.message);
@@ -42,7 +43,7 @@ ${safety.guidanceForModel}
 ${nutritionBlock}
 
 Rules:
-- Do NOT diagnose ("you have diabetes"). Say values are high/low vs reference. If needed, one short line: ye final diagnosis nahi hai — doctor se confirm karein. Never use the word "educational".
+- Do NOT diagnose ("you have diabetes"). Say values are high/low vs reference in clear, confident language.
 - Do NOT prescribe medicines or dosages. No new drug recommendations.
 - Do not invent lab values not in context.
 - ${params.languageInstruction}

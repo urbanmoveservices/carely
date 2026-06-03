@@ -79,7 +79,7 @@ export async function generateReportPdf(params: {
   };
   const labels = params.labels ?? {
     disclaimer: DEFAULT_DISCLAIMER,
-    summary: "AI Summary",
+    summary: "Summary",
     keyFindings: "Key Findings",
     abnormalValues: "Abnormal Values",
     food: "Food Recommendations",
@@ -87,7 +87,7 @@ export async function generateReportPdf(params: {
     lifestyle: "Lifestyle Advice",
     riskFlags: "Risk Flags",
     healthScore: "Health Score",
-    aiSummary: "AI Summary",
+    aiSummary: "Summary",
     healthMetrics: "Health Metrics",
   };
 
@@ -178,21 +178,23 @@ export async function generateReportPdf(params: {
     doc.moveDown(0.5);
 
     // ── Disclaimer ──
-    checkPage(60);
-    doc
-      .roundedRect(doc.x, doc.y, pageWidth, 50, 4)
-      .fillAndStroke("#fef2f2", "#fecaca");
-    doc
-      .fontSize(7.5)
-      .fillColor("#991b1b")
-      .text("IMPORTANT DISCLAIMER", doc.x + 10, doc.y - 44, {
-        width: pageWidth - 20,
-      });
-    doc
-      .fontSize(7)
-      .fillColor("#7f1d1d")
-      .text(labels.disclaimer, { width: pageWidth - 20 });
-    doc.moveDown(1);
+    if (labels.disclaimer?.trim()) {
+      checkPage(60);
+      doc
+        .roundedRect(doc.x, doc.y, pageWidth, 50, 4)
+        .fillAndStroke("#fef2f2", "#fecaca");
+      doc
+        .fontSize(7.5)
+        .fillColor("#991b1b")
+        .text("IMPORTANT NOTICE", doc.x + 10, doc.y - 44, {
+          width: pageWidth - 20,
+        });
+      doc
+        .fontSize(7)
+        .fillColor("#7f1d1d")
+        .text(labels.disclaimer, { width: pageWidth - 20 });
+      doc.moveDown(1);
+    }
 
     // ── Health Score ──
     if (report.healthScore != null) {
@@ -210,12 +212,6 @@ export async function generateReportPdf(params: {
         .fontSize(12)
         .fillColor(GRAY)
         .text(" / 100");
-      doc
-        .fontSize(7.5)
-        .fillColor(LIGHT_GRAY)
-        .text(
-          "This score is an AI-generated clinical estimate to support diagnosis and treatment planning."
-        );
       doc.moveDown(0.3);
     }
 
