@@ -22,9 +22,16 @@ cp .env.example .env
 npm install -g pm2
 ```
 
-3. Install **PostgreSQL**, create the database, and set `DATABASE_URL` in `/var/www/vaidya-gpt/.env`.
-4. Optional: configure **nginx** using `scripts/hostinger/nginx-vaidya-gpt.conf.example` (proxies to `127.0.0.1:7111`).
-5. Enable SSH key login from your PC to the VPS.
+3. Install **PostgreSQL**, create the database, and set `DATABASE_URL` in `/var/www/carely/.env`.
+4. **Point domain DNS to VPS IP** — see [DOMAIN-DNS-SETUP.md](DOMAIN-DNS-SETUP.md) if you see Hostinger parking page.
+5. Configure **nginx + SSL** on the VPS:
+
+```bash
+cd /var/www/carely
+bash scripts/hostinger/setup-nginx-ssl.sh vaidya-gpt.com your-email@example.com
+```
+
+6. Enable SSH key login from your PC to the VPS.
 
 ## One-time local setup
 
