@@ -26,6 +26,7 @@
     "files:encrypt-existing": "tsx scripts/encrypt-existing-files.ts",
     "prod:check": "tsx scripts/production-check.ts",
     "audit:urls": "tsx scripts/audit-hardcoded-urls.ts",
+    "test:razorpay": "tsx scripts/test-razorpay-config.ts",
     "deploy:hostinger": "tsx scripts/deploy-hostinger.ts",
     "test:smoke": "tsx scripts/smoke-test.ts",
     "test:e2e": "tsx scripts/e2e-test.ts",

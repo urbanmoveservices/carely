@@ -87,6 +87,18 @@ export function verifyRazorpayWebhookSignature(
   }
 }
 
+function safeAppUrlForNotes(): string | undefined {
+  try {
+    return getAppUrl();
+  } catch {
+    const url =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+      process.env.APP_URL?.trim() ||
+      process.env.PUBLIC_APP_URL?.trim();
+    return url || undefined;
+  }
+}
+
 export async function createRazorpayOrder(params: {
   userId: string;
   plan: PaidPlanKey;
@@ -105,8 +117,13 @@ export async function createRazorpayOrder(params: {
     throw new Error("Invalid paid plan");
   }
 
+  if (billing.amountPaise < 100) {
+    throw new Error("AMOUNT_TOO_LOW");
+  }
+
   const receipt = `vaidya-${params.userId.slice(0, 8)}-${Date.now()}`;
   const currency = process.env.RAZORPAY_CURRENCY?.trim() || "INR";
+  const appUrlNote = safeAppUrlForNotes();
 
   const res = await fetch(`${RAZORPAY_API}/orders`, {
     method: "POST",
@@ -121,7 +138,7 @@ export async function createRazorpayOrder(params: {
       notes: {
         userId: params.userId,
         plan: params.plan,
-        appUrl: getAppUrl(),
+        ...(appUrlNote ? { appUrl: appUrlNote } : {}),
       },
     }),
   });
@@ -130,11 +147,17 @@ export async function createRazorpayOrder(params: {
     id?: string;
     amount?: number;
     currency?: string;
-    error?: { description?: string };
+    error?: { description?: string; code?: string };
   };
 
+  if (res.status === 401) {
+    throw new Error("RAZORPAY_AUTH_FAILED");
+  }
+
   if (!res.ok || !data.id) {
-    throw new Error(data.error?.description || "Failed to create Razorpay order");
+    const detail =
+      data.error?.description || data.error?.code || `HTTP ${res.status}`;
+    throw new Error(`RAZORPAY_API:${detail}`);
   }
 
   if (data.amount !== billing.amountPaise) {
@@ -155,13 +178,18 @@ export async function createRazorpayOrder(params: {
     },
   });
 
+  const publicKeyId = getRazorpayPublicKeyId();
+  if (!publicKeyId) {
+    throw new Error("RAZORPAY_KEY_ID missing");
+  }
+
   return {
     providerOrderId: data.id,
     amountPaise: billing.amountPaise,
     currency: order.currency,
     receipt,
     paymentOrderId: order.id,
-    keyId: getRazorpayCredentials().keyId,
+    keyId: publicKeyId,
     plan: params.plan,
   };
 }

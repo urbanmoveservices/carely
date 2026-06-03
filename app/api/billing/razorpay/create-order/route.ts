@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
     return ok({
       keyId: order.keyId,
       orderId: order.providerOrderId,
+      order_id: order.providerOrderId,
       amount: order.amountPaise,
       currency: order.currency,
       plan: order.plan,
@@ -89,6 +90,30 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("[razorpay_create_order]", err);
+    if (err instanceof Error) {
+      if (err.message === "RAZORPAY_AUTH_FAILED") {
+        return fail("Razorpay authentication failed. Check API keys.", 401, "RAZORPAY_AUTH_FAILED");
+      }
+      if (err.message === "AMOUNT_TOO_LOW") {
+        return fail("Amount must be at least 100 paise.", 400, "AMOUNT_TOO_LOW");
+      }
+      if (err.message.startsWith("RAZORPAY_API:")) {
+        const detail = err.message.replace("RAZORPAY_API:", "").trim();
+        return fail(
+          `Razorpay error: ${detail}`,
+          502,
+          "RAZORPAY_API_ERROR"
+        );
+      }
+      if (err.message.includes("PaymentOrder") || err.message.includes("prisma")) {
+        console.error("[razorpay_create_order] database error:", err.message);
+        return fail(
+          "Could not save payment order. Check database migrations.",
+          500,
+          "PAYMENT_ORDER_DB_ERROR"
+        );
+      }
+    }
     return serverError("Could not create payment order.");
   }
 }
