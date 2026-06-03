@@ -97,6 +97,10 @@ export async function POST(req: NextRequest) {
       if (err.message === "AMOUNT_TOO_LOW") {
         return fail("Amount must be at least 100 paise.", 400, "AMOUNT_TOO_LOW");
       }
+      if (err.message.startsWith("RAZORPAY_KEY_MISMATCH:")) {
+        const detail = err.message.replace("RAZORPAY_KEY_MISMATCH:", "").trim();
+        return fail(detail, 503, "RAZORPAY_KEY_MISMATCH");
+      }
       if (err.message.startsWith("RAZORPAY_API:")) {
         const detail = err.message.replace("RAZORPAY_API:", "").trim();
         return fail(

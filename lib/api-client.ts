@@ -616,6 +616,8 @@ export const api = {
       enabled: boolean;
       configured: boolean;
       keyIdPresent: boolean;
+      mode?: "test" | "live" | "unknown";
+      keyPrefix?: string | null;
       currency: string;
       message?: string;
     }>("/api/billing/razorpay/status"),

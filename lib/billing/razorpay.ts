@@ -16,19 +16,63 @@ export function isRazorpayEnabled(): boolean {
   return process.env.RAZORPAY_ENABLED === "true";
 }
 
-export function isRazorpayConfigured(): boolean {
-  if (!isRazorpayEnabled()) return false;
-  return Boolean(
-    process.env.RAZORPAY_KEY_ID?.trim() &&
-      process.env.RAZORPAY_KEY_SECRET?.trim() &&
-      getRazorpayPublicKeyId()
-  );
+export type RazorpayKeyMode = "test" | "live" | "unknown";
+
+export function getRazorpayKeyMode(keyId: string | null | undefined): RazorpayKeyMode {
+  if (!keyId) return "unknown";
+  if (keyId.startsWith("rzp_test_")) return "test";
+  if (keyId.startsWith("rzp_live_")) return "live";
+  return "unknown";
+}
+
+/** Key passed to Checkout — must match credentials used to create orders (runtime RAZORPAY_KEY_ID). */
+export function getRazorpayCheckoutKeyId(): string | null {
+  return process.env.RAZORPAY_KEY_ID?.trim() || null;
 }
 
 export function getRazorpayPublicKeyId(): string | null {
-  const pub = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim();
-  const key = process.env.RAZORPAY_KEY_ID?.trim();
-  return pub || key || null;
+  return getRazorpayCheckoutKeyId();
+}
+
+export function getRazorpayKeyAlignment(): {
+  ok: boolean;
+  mode: RazorpayKeyMode;
+  message?: string;
+} {
+  const serverKey = process.env.RAZORPAY_KEY_ID?.trim();
+  const publicKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim();
+  const secret = process.env.RAZORPAY_KEY_SECRET?.trim();
+
+  if (!serverKey || !secret) {
+    return { ok: false, mode: "unknown", message: "Razorpay keys are incomplete." };
+  }
+
+  const serverMode = getRazorpayKeyMode(serverKey);
+
+  if (publicKey && publicKey !== serverKey) {
+    return {
+      ok: false,
+      mode: serverMode,
+      message:
+        "NEXT_PUBLIC_RAZORPAY_KEY_ID must equal RAZORPAY_KEY_ID. After changing keys, set both in .env and run npm run build, then pm2 restart.",
+    };
+  }
+
+  if (publicKey && getRazorpayKeyMode(publicKey) !== serverMode) {
+    return {
+      ok: false,
+      mode: serverMode,
+      message: "Razorpay test/live mode mismatch between server and public keys.",
+    };
+  }
+
+  return { ok: true, mode: serverMode };
+}
+
+export function isRazorpayConfigured(): boolean {
+  if (!isRazorpayEnabled()) return false;
+  const alignment = getRazorpayKeyAlignment();
+  return alignment.ok && Boolean(getRazorpayCheckoutKeyId());
 }
 
 function getRazorpayCredentials(): { keyId: string; keySecret: string } {
@@ -178,9 +222,14 @@ export async function createRazorpayOrder(params: {
     },
   });
 
-  const publicKeyId = getRazorpayPublicKeyId();
-  if (!publicKeyId) {
+  const checkoutKeyId = getRazorpayCheckoutKeyId();
+  if (!checkoutKeyId) {
     throw new Error("RAZORPAY_KEY_ID missing");
+  }
+
+  const alignment = getRazorpayKeyAlignment();
+  if (!alignment.ok) {
+    throw new Error(`RAZORPAY_KEY_MISMATCH:${alignment.message || "Key mismatch"}`);
   }
 
   return {
@@ -189,7 +238,7 @@ export async function createRazorpayOrder(params: {
     currency: order.currency,
     receipt,
     paymentOrderId: order.id,
-    keyId: publicKeyId,
+    keyId: checkoutKeyId,
     plan: params.plan,
   };
 }

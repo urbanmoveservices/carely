@@ -30,6 +30,7 @@ function BillingContent() {
   const [payments, setPayments] = useState<PaymentHistoryItem[]>([]);
   const [razorpayConfigured, setRazorpayConfigured] = useState(false);
   const [razorpayMessage, setRazorpayMessage] = useState("");
+  const [razorpayMode, setRazorpayMode] = useState<"test" | "live" | "unknown">("unknown");
   const [paymentsWarning, setPaymentsWarning] = useState("");
   const [msg, setMsg] = useState("");
   const [usageError, setUsageError] = useState("");
@@ -52,6 +53,7 @@ function BillingContent() {
         enabled: false,
         configured: false,
         keyIdPresent: false,
+        mode: "unknown" as const,
         currency: "INR",
         message: "Razorpay payments are not configured.",
       })),
@@ -68,6 +70,9 @@ function BillingContent() {
       setPlans(p.plans);
       const configured = rz.configured && rz.keyIdPresent;
       setRazorpayConfigured(configured);
+      setRazorpayMode(
+        rz.mode === "live" || rz.mode === "test" ? rz.mode : "unknown"
+      );
       setRazorpayMessage(
         configured
           ? ""
@@ -98,10 +103,20 @@ function BillingContent() {
           </p>
           {razorpayConfigured && (
             <p className="text-xs text-gray-500 mt-2">
-              Test mode: use Indian domestic card{" "}
-              <span className="font-mono">5267 3181 8797 5449</span> or UPI{" "}
-              <span className="font-mono">success@razorpay</span>. International cards
-              are not enabled on this Razorpay account.
+              Razorpay mode:{" "}
+              <span className="font-medium text-gray-700">
+                {razorpayMode === "live" ? "Live" : razorpayMode === "test" ? "Test" : "Unknown"}
+              </span>
+              {razorpayMode === "test" && (
+                <>
+                  {" "}
+                  — use card <span className="font-mono">5267 3181 8797 5449</span> or UPI{" "}
+                  <span className="font-mono">success@razorpay</span>
+                </>
+              )}
+              {razorpayMode === "live" && (
+                <> — real payments; use Indian cards/UPI enabled on your Razorpay account.</>
+              )}
             </p>
           )}
         </div>

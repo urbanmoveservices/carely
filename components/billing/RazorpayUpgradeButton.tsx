@@ -114,9 +114,9 @@ export function RazorpayUpgradeButton({
 
       setStatus("Opening Razorpay…");
 
-      const rzp = new window.Razorpay({
+      const prefillContact = order.prefill?.contact?.trim() || "";
+      const checkoutOptions: Record<string, unknown> = {
         key: order.keyId,
-        amount: order.amount,
         currency: order.currency,
         name: "Vaidya GPT",
         description: `${plan === "pro" ? "Pro" : "Family"} plan`,
@@ -124,7 +124,7 @@ export function RazorpayUpgradeButton({
         prefill: {
           name: order.prefill?.name || userName || "",
           email: order.prefill?.email || userEmail || "",
-          contact: order.prefill?.contact || "",
+          ...(prefillContact ? { contact: prefillContact } : {}),
         },
         theme: { color: "#0d9488" },
         handler: async (response: RazorpayHandlerResponse) => {
@@ -148,7 +148,9 @@ export function RazorpayUpgradeButton({
             finish("Payment was cancelled.", true);
           },
         },
-      });
+      };
+
+      const rzp = new window.Razorpay(checkoutOptions);
 
       rzp.on("payment.failed", (response) => {
         const detail =
@@ -175,9 +177,11 @@ export function RazorpayUpgradeButton({
       }
       const msg =
         err instanceof Error
-          ? err.message.includes("RAZORPAY") || err.message.includes("configured")
+          ? err.code === "RAZORPAY_KEY_MISMATCH"
             ? err.message
-            : err.message || "Could not start Razorpay checkout."
+            : err.message.includes("RAZORPAY") || err.message.includes("configured")
+              ? err.message
+              : err.message || "Could not start Razorpay checkout."
           : "Could not start Razorpay checkout.";
       finish(msg, true);
     }
