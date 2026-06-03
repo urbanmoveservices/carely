@@ -28,7 +28,8 @@ function testStoreKey(email: string, type: EmailOtpType): string {
 }
 
 function rememberTestOtp(email: string, type: EmailOtpType, code: string) {
-  if (!canUseTestOtpHelper(email)) return;
+  if (process.env.NODE_ENV === "production") return;
+  if (!isE2eTestEmail(email)) return;
   testOtpStore.set(testStoreKey(email, type), {
     code,
     expiresAt: Date.now() + 15 * 60 * 1000,
