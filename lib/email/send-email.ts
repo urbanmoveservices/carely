@@ -1,15 +1,21 @@
 import prisma from "@/lib/prisma";
 import { isSmtpConfigured } from "./provider";
 import { renderEmailTemplate, type EmailTemplateType } from "./templates";
+import { getDefaultFromAddress } from "./config";
 
 export async function sendEmail(params: {
   to: string;
   type: EmailTemplateType;
   data: Record<string, string>;
   userId?: string | null;
+  subject?: string;
+  html?: string;
+  text?: string;
 }): Promise<{ ok: boolean; preview?: boolean; logId: string }> {
-  const { subject, html, text } = renderEmailTemplate(params.type, params.data);
-
+  const rendered = renderEmailTemplate(params.type, params.data);
+  const subject = params.subject ?? rendered.subject;
+  const html = params.html ?? rendered.html;
+  const text = params.text ?? rendered.text;
   const log = await prisma.emailLog.create({
     data: {
       userId: params.userId ?? null,
@@ -56,8 +62,7 @@ async function sendViaSmtp(payload: {
   const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  const from = process.env.SMTP_FROM!;
-
+  const from = getDefaultFromAddress();
   const body = [
     `From: ${from}`,
     `To: ${payload.to}`,

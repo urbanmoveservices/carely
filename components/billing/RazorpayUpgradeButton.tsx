@@ -14,7 +14,15 @@ type RazorpayHandlerResponse = {
 
 type RazorpayCheckoutInstance = {
   open: () => void;
-  on: (event: string, handler: () => void) => void;
+  on: (event: string, handler: (response?: RazorpayFailedResponse) => void) => void;
+};
+
+type RazorpayFailedResponse = {
+  error?: {
+    description?: string;
+    reason?: string;
+    code?: string;
+  };
 };
 
 declare global {
@@ -34,6 +42,18 @@ type Props = {
   onSuccess?: (message: string) => void;
   onError?: (message: string) => void;
 };
+
+function isErrorStatus(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("failed") ||
+    lower.includes("cancelled") ||
+    lower.includes("could not") ||
+    lower.includes("not supported") ||
+    lower.includes("error") ||
+    lower.includes("invalid")
+  );
+}
 
 function verifyErrorMessage(err: unknown): string {
   if (err instanceof Error) {
@@ -130,8 +150,12 @@ export function RazorpayUpgradeButton({
         },
       });
 
-      rzp.on("payment.failed", () => {
-        finish("Payment failed. Please try again.", true);
+      rzp.on("payment.failed", (response) => {
+        const detail =
+          response?.error?.description ||
+          response?.error?.reason ||
+          "Payment failed. Please try again.";
+        finish(detail, true);
       });
 
       try {
@@ -182,11 +206,7 @@ export function RazorpayUpgradeButton({
       {status && !disabled && (
         <p
           className={`text-xs ${
-            status.includes("failed") ||
-            status.includes("cancelled") ||
-            status.includes("Could not")
-              ? "text-red-600"
-              : "text-gray-600"
+            isErrorStatus(status) ? "text-red-600" : "text-gray-600"
           }`}
         >
           {status}

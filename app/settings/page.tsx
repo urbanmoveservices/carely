@@ -79,7 +79,6 @@ function SettingsContent() {
   const [prefs, setPrefs] = useState<UserPreference | null>(null);
   const [prefsSaving, setPrefsSaving] = useState(false);
   const [verifyMsg, setVerifyMsg] = useState("");
-  const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
   const [verifyLoading, setVerifyLoading] = useState(false);
 
   useEffect(() => {
@@ -268,31 +267,32 @@ function SettingsContent() {
             </p>
             {!user?.emailVerified && (
               <>
-                <Button
-                  size="sm"
-                  loading={verifyLoading}
-                  onClick={async () => {
-                    setVerifyLoading(true);
-                    try {
-                      const res = await api.sendVerification();
-                      setVerifyMsg(res.message);
-                      setVerifyUrl(res.verificationUrl ?? null);
-                    } catch (e: unknown) {
-                      setVerifyMsg(e instanceof Error ? e.message : "Failed");
-                    } finally {
-                      setVerifyLoading(false);
-                    }
-                  }}
-                >
-                  Send verification link
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    loading={verifyLoading}
+                    onClick={async () => {
+                      setVerifyLoading(true);
+                      try {
+                        const res = await api.sendEmailVerificationCode();
+                        setVerifyMsg(res.message);
+                      } catch (e: unknown) {
+                        setVerifyMsg(e instanceof Error ? e.message : "Failed");
+                      } finally {
+                        setVerifyLoading(false);
+                      }
+                    }}
+                  >
+                    Send verification code
+                  </Button>
+                  <Link href="/verify-email">
+                    <Button size="sm" variant="outline">
+                      Enter code
+                    </Button>
+                  </Link>
+                </div>
                 {verifyMsg && (
                   <p className="text-xs text-gray-500 mt-2">{verifyMsg}</p>
-                )}
-                {verifyUrl && (
-                  <a href={verifyUrl} className="text-xs text-brand-600 underline break-all block mt-1">
-                    Dev verification link
-                  </a>
                 )}
               </>
             )}

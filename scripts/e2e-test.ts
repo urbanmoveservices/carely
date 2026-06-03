@@ -664,6 +664,142 @@ async function sectionAuth() {
   }
 
   skip("logout_api", "No API logout endpoint");
+
+  await sectionEmailOtp();
+}
+
+async function fetchLatestOtp(email: string, type: string): Promise<string | null> {
+  if (process.env.E2E_ALLOW_TEST_HELPERS !== "true") return null;
+  const res = await apiFetch(
+    `/api/test/latest-otp?email=${encodeURIComponent(email)}&type=${encodeURIComponent(type)}`
+  );
+  if (res.status !== 200 || !res.data.code) return null;
+  return String(res.data.code);
+}
+
+async function sectionEmailOtp() {
+  if (process.env.E2E_ALLOW_TEST_HELPERS !== "true") {
+    skip("email_otp_signup_unverified", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("email_otp_wrong_code", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("email_otp_verify_success", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("email_otp_resend_cooldown", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("forgot_password_unknown_generic", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("forgot_password_reset_flow", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("login_old_password_fails", "E2E_ALLOW_TEST_HELPERS not set");
+    skip("login_new_password_works", "E2E_ALLOW_TEST_HELPERS not set");
+    return;
+  }
+
+  if (!state.sessionA) {
+    fail("email_otp_signup_unverified", "no session A");
+    return;
+  }
+
+  const meBefore = await apiFetch("/api/auth/me", {}, state.sessionA);
+  meBefore.data.emailVerified === false
+    ? pass("email_otp_signup_unverified")
+    : fail("email_otp_signup_unverified", "expected unverified after signup");
+
+  const otp = await fetchLatestOtp(state.emailA, "email_verification");
+  if (!otp) {
+    fail("email_otp_wrong_code", "no OTP from test helper");
+    fail("email_otp_verify_success", "no OTP");
+    return;
+  }
+
+  const bad = await apiFetch(
+    "/api/auth/email/verify-code",
+    { method: "POST", body: JSON.stringify({ code: "000000" }) },
+    state.sessionA
+  );
+  bad.status === 400 && bad.data.code === "INVALID_OTP"
+    ? pass("email_otp_wrong_code")
+    : fail("email_otp_wrong_code", `status ${bad.status} code ${bad.data.code}`);
+
+  const good = await apiFetch(
+    "/api/auth/email/verify-code",
+    { method: "POST", body: JSON.stringify({ code: otp }) },
+    state.sessionA
+  );
+  good.status === 200
+    ? pass("email_otp_verify_success")
+    : fail("email_otp_verify_success", `status ${good.status}`);
+
+  const send1 = await apiFetch(
+    "/api/auth/email/send-code",
+    { method: "POST", body: JSON.stringify({}) },
+    state.sessionA
+  );
+  const send2 = await apiFetch(
+    "/api/auth/email/send-code",
+    { method: "POST", body: JSON.stringify({}) },
+    state.sessionA
+  );
+  send2.status === 429 || send2.data.code === "OTP_RESEND_COOLDOWN"
+    ? pass("email_otp_resend_cooldown")
+    : fail("email_otp_resend_cooldown", `status ${send2.status}`);
+
+  const unknownForgot = await apiFetch("/api/auth/password/forgot", {
+    method: "POST",
+    body: JSON.stringify({ email: `nobody-${e2eRunId}@vaidya.test` }),
+  });
+  unknownForgot.status === 200 &&
+  String(unknownForgot.data.message || "").includes("If an account exists")
+    ? pass("forgot_password_unknown_generic")
+    : fail("forgot_password_unknown_generic", `status ${unknownForgot.status}`);
+
+  const resetEmail = state.emailB;
+  const forgot = await apiFetch("/api/auth/password/forgot", {
+    method: "POST",
+    body: JSON.stringify({ email: resetEmail }),
+  });
+  if (forgot.status !== 200) {
+    fail("forgot_password_reset_flow", `forgot status ${forgot.status}`);
+    return;
+  }
+  pass("forgot_password_reset_flow");
+
+  const resetOtp = await fetchLatestOtp(resetEmail, "password_reset");
+  if (!resetOtp || !state.sessionB) {
+    fail("login_old_password_fails", "missing reset OTP or session B");
+    fail("login_new_password_works", "missing reset OTP");
+    return;
+  }
+
+  const NEW_PASSWORD = "NewPass@123456";
+  const reset = await apiFetch("/api/auth/password/reset-with-code", {
+    method: "POST",
+    body: JSON.stringify({
+      email: resetEmail,
+      code: resetOtp,
+      newPassword: NEW_PASSWORD,
+    }),
+  });
+  if (reset.status !== 200) {
+    fail("login_new_password_works", `reset status ${reset.status}`);
+    return;
+  }
+
+  const oldLogin = await apiFetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email: resetEmail, password: E2E_PASSWORD }),
+  });
+  oldLogin.status !== 200 ? pass("login_old_password_fails") : fail("login_old_password_fails");
+
+  const newLogin = await apiFetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email: resetEmail, password: NEW_PASSWORD }),
+  });
+  if (newLogin.status === 200 && newLogin.data.access_token) {
+    pass("login_new_password_works");
+    state.sessionB = {
+      token: String(newLogin.data.access_token),
+      email: resetEmail,
+      userId: state.sessionB.userId,
+    };
+  } else {
+    fail("login_new_password_works", `status ${newLogin.status}`);
+  }
 }
 
 async function sectionOnboarding() {

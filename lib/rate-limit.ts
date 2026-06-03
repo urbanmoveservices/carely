@@ -53,6 +53,10 @@ export function getClientIp(request: Request): string {
 
 // Preset rate limit configs
 export const RATE_LIMITS = {
+  OTP_SEND:           { limit: 5,   windowMs: 10 * 60 * 1000 },
+  OTP_VERIFY:         { limit: 20,  windowMs: 10 * 60 * 1000 },
+  OTP_FORGOT:         { limit: 5,   windowMs: 10 * 60 * 1000 },
+  OTP_RESET:          { limit: 10,  windowMs: 10 * 60 * 1000 },
   SIGNUP:           { limit: 5,   windowMs: 10 * 60 * 1000 },
   LOGIN:            { limit: 10,  windowMs: 10 * 60 * 1000 },
   ADMIN_LOGIN:      { limit: 5,   windowMs: 10 * 60 * 1000 },

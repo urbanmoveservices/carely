@@ -16,7 +16,6 @@ const schema = z.object({
   email: z.string().email(),
 });
 
-/** Legacy route — delegates to OTP password reset flow. */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -27,6 +26,7 @@ export async function POST(req: NextRequest) {
 
     const email = parsed.data.email.trim().toLowerCase();
     const generic = {
+      success: true,
       message: "If an account exists, a reset code has been sent.",
     };
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     return ok(generic);
   } catch (err) {
-    console.error("Forgot password error:", err);
+    console.error("Password forgot OTP error:", err);
     return serverError();
   }
 }

@@ -6,7 +6,16 @@ export const COMPANY_NAME = BRAND.operator;
 export const PRODUCT_NAME = BRAND.name;
 export const PRODUCT_SHORT_NAME = BRAND.shortName;
 
-export const SUPPORT_EMAIL = "support@urbanmoveservices.com";
+export function getSupportEmail(): string {
+  return (
+    process.env.SUPPORT_EMAIL?.trim() ||
+    process.env.APP_SUPPORT_EMAIL?.trim() ||
+    "support@vaidya-gpt.com"
+  );
+}
+
+/** @deprecated use getSupportEmail() */
+export const SUPPORT_EMAIL = getSupportEmail();
 export const LEGAL_EMAIL = "legal@urbanmoveservices.com";
 
 /** Display date for legal pages (update when policies change). */

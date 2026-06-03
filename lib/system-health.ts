@@ -20,6 +20,7 @@ function getUploadRoot(): string {
 }
 
 import { getAppUrl } from "./app-url";
+import { getSmtpFromDomain } from "./email/config";
 
 function parseAppPort(): number {
   const url = getAppUrl();
@@ -98,6 +99,7 @@ export async function getSystemHealth() {
     activeRisks,
     criticalRisks,
     warningRisks,
+    failedEmailLogs,
   ] = await Promise.all([
     safeCount(() =>
       prisma.document.count({ where: { uploadStatus: "failed" } })
@@ -146,6 +148,7 @@ export async function getSystemHealth() {
           })
         )
       : Promise.resolve(0),
+    safeCount(() => prisma.emailLog.count({ where: { status: "failed" } })),
   ]);
 
   return {
@@ -188,6 +191,8 @@ export async function getSystemHealth() {
     email: {
       configured: isEmailConfigured(),
       ok: isEmailConfigured(),
+      fromDomain: getSmtpFromDomain(),
+      failedLogCount: Math.max(0, failedEmailLogs),
     },
     push: {
       configured: isPushConfigured(),

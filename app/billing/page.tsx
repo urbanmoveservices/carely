@@ -96,6 +96,14 @@ function BillingContent() {
               ? t("billing.razorpayNote")
               : razorpayMessage || "Razorpay payments are not configured."}
           </p>
+          {razorpayConfigured && (
+            <p className="text-xs text-gray-500 mt-2">
+              Test mode: use Indian domestic card{" "}
+              <span className="font-mono">5267 3181 8797 5449</span> or UPI{" "}
+              <span className="font-mono">success@razorpay</span>. International cards
+              are not enabled on this Razorpay account.
+            </p>
+          )}
         </div>
 
         {usageError && (

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/family-auth";
+import prisma from "@/lib/prisma";
 import { ok, fail, failWithMeta, serverError, rateLimited } from "@/lib/api-response";
 import {
   checkRateLimit,
@@ -12,7 +12,6 @@ import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 import { createAndSendEmailOtp } from "@/lib/auth/email-otp-service";
 import { maskEmail } from "@/lib/auth/mask-email";
 
-/** Legacy route — sends 6-digit verification OTP (same as /api/auth/email/send-code). */
 export async function POST(req: NextRequest) {
   try {
     const auth = await requireAuth(req);
@@ -22,8 +21,14 @@ export async function POST(req: NextRequest) {
       where: { id: auth.payload.userId },
     });
     if (!user) return fail("User not found", 404);
+
     if (user.emailVerified) {
-      return ok({ message: "Email already verified.", alreadyVerified: true });
+      return ok({
+        success: true,
+        message: "Email already verified.",
+        code: "EMAIL_ALREADY_VERIFIED",
+        emailMasked: maskEmail(user.email),
+      });
     }
 
     if (!shouldBypassAuthRateLimit(user.email)) {
@@ -55,11 +60,12 @@ export async function POST(req: NextRequest) {
     );
 
     return ok({
+      success: true,
       message: "Verification code sent.",
       emailMasked: sent.emailMasked,
     });
   } catch (err) {
-    console.error("Send verification error:", err);
+    console.error("Send verification code error:", err);
     return serverError();
   }
 }

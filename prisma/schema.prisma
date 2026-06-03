@@ -72,6 +72,7 @@ model User {
   emergencyCards        EmergencyHealthCard[]
   usageCounters         UsageCounter[]
   authTokens            AuthToken[]
+  emailOtps             EmailOtp[]
   demoSeedLog           DemoSeedLog?
   healthRisks           HealthRisk[]
   timelineEvents        FamilyTimelineEvent[]
@@ -119,6 +120,28 @@ model AuthToken {
   @@index([userId])
   @@index([type])
   @@index([token])
+  @@index([expiresAt])
+}
+
+model EmailOtp {
+  id          String    @id @default(cuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email       String
+  type        String
+  codeHash    String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5)
+  lastSentAt  DateTime  @default(now())
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([email])
+  @@index([userId])
+  @@index([type])
   @@index([expiresAt])
 }
 

@@ -252,6 +252,15 @@ export async function POST(req: NextRequest) {
         },
       });
       console.error("Storage error:", storageErr);
+      const storageMessage =
+        storageErr instanceof Error ? storageErr.message : "File storage failed";
+      if (storageMessage.includes("FILE_ENCRYPTION_KEY")) {
+        return fail(
+          "File uploads are not configured on the server (missing FILE_ENCRYPTION_KEY). Contact support.",
+          503,
+          "STORAGE_NOT_CONFIGURED"
+        );
+      }
       return fail("File storage failed", 500, "STORAGE_FAILED");
     }
 

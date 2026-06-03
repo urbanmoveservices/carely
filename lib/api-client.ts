@@ -72,8 +72,11 @@ async function request<T>(
   if (!res.ok) {
     const err = new Error(
       data.error || data.message || "Request failed"
-    ) as Error & { code?: string };
+    ) as Error & { code?: string; retryAfterSeconds?: number };
     if (data.code) err.code = data.code;
+    if (typeof data.retryAfterSeconds === "number") {
+      err.retryAfterSeconds = data.retryAfterSeconds;
+    }
     throw err;
   }
 
@@ -676,15 +679,41 @@ export const api = {
       if (!res.ok) throw new Error(data.error || "Demo login failed");
       return data as DemoLoginResponse;
     }),
-  forgotPassword: (email: string) =>
-    fetch("/api/auth/forgot-password", {
+  requestPasswordResetCode: (email: string) =>
+    fetch("/api/auth/password/forgot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     }).then(async (res) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Request failed");
-      return data as { message: string; resetUrl?: string };
+      return data as { success: boolean; message: string };
+    }),
+  forgotPassword: (email: string) =>
+    fetch("/api/auth/password/forgot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      return data as { success: boolean; message: string };
+    }),
+  resetPasswordWithCode: (email: string, code: string, newPassword: string) =>
+    fetch("/api/auth/password/reset-with-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code, newPassword }),
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) {
+        const err = new Error(data.error || "Reset failed") as Error & {
+          code?: string;
+        };
+        if (data.code) err.code = data.code;
+        throw err;
+      }
+      return data as { success: boolean; message: string };
     }),
   resetPassword: (token: string, password: string) =>
     fetch("/api/auth/reset-password", {
@@ -696,10 +725,18 @@ export const api = {
       if (!res.ok) throw new Error(data.error || "Reset failed");
       return data;
     }),
-  sendVerification: () =>
-    request<{ message: string; verificationUrl?: string }>(
-      "/api/auth/send-verification",
-      { method: "POST", body: JSON.stringify({}) }
+  sendVerification: () => api.sendEmailVerificationCode(),
+  sendEmailVerificationCode: () =>
+    request<{
+      success?: boolean;
+      message: string;
+      emailMasked?: string;
+      code?: string;
+    }>("/api/auth/email/send-code", { method: "POST", body: JSON.stringify({}) }),
+  verifyEmailCode: (code: string) =>
+    request<{ success: boolean; message: string }>(
+      "/api/auth/email/verify-code",
+      { method: "POST", body: JSON.stringify({ code }) }
     ),
   verifyEmail: (token: string) =>
     fetch("/api/auth/verify-email", {

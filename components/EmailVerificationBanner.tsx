@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { api } from "@/lib/api-client";
 import { Alert } from "./ui/Alert";
@@ -10,10 +12,10 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 
 export function EmailVerificationBanner() {
   const { user, refreshUser } = useAuth();
+  const router = useRouter();
   const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [devLink, setDevLink] = useState<string | null>(null);
   const [msg, setMsg] = useState("");
 
   if (!user || user.emailVerified || dismissed || user.role === "admin") {
@@ -24,9 +26,8 @@ export function EmailVerificationBanner() {
     setLoading(true);
     setMsg("");
     try {
-      const res = await api.sendVerification();
+      const res = await api.sendEmailVerificationCode();
       setMsg(res.message);
-      if (res.verificationUrl) setDevLink(res.verificationUrl);
       await refreshUser();
     } catch (e: unknown) {
       setMsg(e instanceof Error ? e.message : "Failed to send");
@@ -53,19 +54,16 @@ export function EmailVerificationBanner() {
               {t("dashboard.verifyEmail")}
             </p>
             {msg && <p className="text-sm mt-1 text-gray-600">{msg}</p>}
-            {devLink && (
-              <a
-                href={devLink}
-                className="text-sm text-brand-700 underline break-all mt-1 block"
-              >
-                Dev verification link
-              </a>
-            )}
           </div>
         </div>
-        <Button size="sm" onClick={send} loading={loading} className="shrink-0">
-          {t("dashboard.sendVerificationLink")}
-        </Button>
+        <div className="flex flex-wrap gap-2 shrink-0">
+          <Button size="sm" variant="outline" onClick={send} loading={loading}>
+            {t("dashboard.sendVerificationCode")}
+          </Button>
+          <Button size="sm" onClick={() => router.push("/verify-email")}>
+            {t("dashboard.enterVerificationCode")}
+          </Button>
+        </div>
       </div>
     </Alert>
   );

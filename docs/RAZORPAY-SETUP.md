@@ -48,7 +48,19 @@ On production server: edit `/var/www/carely/.env` and run `pm2 restart vaidya-gp
 4. Complete profile with **phone number** (required for Razorpay prefill)
 5. Open **http://localhost:7111/billing**
 6. Click **Upgrade with Razorpay** on Pro or Family
-7. Use Razorpay test card: `4111 1111 1111 1111`, any future expiry, any CVV
+7. Use Razorpay test payment (INR / domestic only unless international is enabled on your Razorpay account):
+
+| Method | Test value |
+|--------|------------|
+| Domestic Mastercard | `5267 3181 8797 5449` |
+| Domestic Visa | `4111 1111 1111 1111` |
+| UPI (test mode) | `success@razorpay` |
+| Netbanking / Wallet | Use Razorpay mock success button |
+
+Any future expiry date and any CVV.
+
+**If you see:** `International cards are not supported` — your Razorpay merchant account accepts **Indian domestic payments only**. Use the domestic test cards above, or enable international payments in the [Razorpay Dashboard](https://dashboard.razorpay.com/) under payment methods / international settings.
+
 8. After payment, plan should activate and show success message
 
 Verify config:
