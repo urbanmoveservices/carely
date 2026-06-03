@@ -6,6 +6,7 @@ import {
   getOtpExpiry,
   getOtpMaxAttempts,
   hashOtp,
+  isE2eTestEmail,
   isValidSixDigitCode,
   shouldDevPrintOtp,
   verifyOtpHash,
