@@ -5,7 +5,7 @@ import { requireAuth } from "@/lib/family-auth";
 import { serverError, validationError, fail } from "@/lib/api-response";
 import { planAllowsCaregiverSharing } from "@/lib/plans";
 import { generateSecureToken, maskToken } from "@/lib/secure-token";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 
 const createSchema = z.object({

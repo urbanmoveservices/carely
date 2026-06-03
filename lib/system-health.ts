@@ -19,8 +19,10 @@ function getUploadRoot(): string {
   );
 }
 
+import { getAppUrl } from "./app-url";
+
 function parseAppPort(): number {
-  const url = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7111";
+  const url = getAppUrl();
   try {
     const u = new URL(url);
     return u.port ? parseInt(u.port, 10) : u.protocol === "https:" ? 443 : 80;

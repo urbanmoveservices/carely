@@ -2,5 +2,6 @@ node_modules/
 .next/
 test-results/
 .env
+.env.deploy
 storage/uploads/*
 !storage/uploads/.gitkeep

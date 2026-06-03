@@ -611,7 +611,7 @@ async function runBillingChecks(results: Map<string, VerifyResult>) {
     ? pass(results, "billing_payment_history", "Razorpay billing API routes present")
     : fail(results, "billing_payment_history", missingRoutes.join(", "));
 
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7111";
+  const base = BASE_URL;
   try {
     const { RAZORPAY_CSP_REQUIRED_HOSTS } = require("../lib/security-headers.js") as {
       RAZORPAY_CSP_REQUIRED_HOSTS: string[];

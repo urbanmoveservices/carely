@@ -102,7 +102,8 @@ function AdminSettingsContent({ user }: { user: User }) {
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-sm text-gray-600">App URL</span>
                 <span className="text-sm font-mono text-gray-900">
-                  http://localhost:7111
+                  {process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+                    "Not configured — set NEXT_PUBLIC_APP_URL"}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">

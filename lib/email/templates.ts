@@ -1,4 +1,5 @@
 import { PRODUCT_NAME } from "@/lib/company";
+import { absoluteUrl } from "@/lib/app-url";
 
 export type EmailTemplateType =
   | "email_verification"
@@ -13,8 +14,6 @@ export function renderEmailTemplate(
   type: EmailTemplateType,
   data: Record<string, string>
 ): { subject: string; html: string; text: string } {
-  const appUrl = data.appUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7111";
-
   switch (type) {
     case "email_verification":
       return {
@@ -43,7 +42,7 @@ export function renderEmailTemplate(
     case "reminder":
       return {
         subject: data.title || `Reminder — ${PRODUCT_NAME}`,
-        html: `<p>${data.body || "You have a health reminder."}</p><p><a href="${appUrl}/reminders">View reminders</a></p>`,
+        html: `<p>${data.body || "You have a health reminder."}</p><p><a href="${absoluteUrl("/reminders")}">View reminders</a></p>`,
         text: data.body || "",
       };
     case "monthly_digest":

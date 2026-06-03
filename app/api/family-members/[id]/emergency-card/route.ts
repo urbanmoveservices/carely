@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireAuth, requireFamilyMember } from "@/lib/family-auth";
 import { serverError, validationError } from "@/lib/api-response";
 import { generateSecureToken } from "@/lib/secure-token";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { generateEmergencyCardPdf } from "@/lib/pdf-emergency-card";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 

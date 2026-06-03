@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/family-auth";
 import { forbidden, notFound, serverError, validationError } from "@/lib/api-response";
 import { generateSecureToken } from "@/lib/secure-token";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { resolveReportForUser } from "@/lib/report-resolve";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 

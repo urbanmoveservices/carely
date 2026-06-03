@@ -491,7 +491,10 @@ API: `POST /api/admin/maintenance/cleanup-files` with `{ "dryRun": true }` or `{
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `JWT_SECRET` | Yes | JWT signing secret (min 32 chars recommended) |
-| `NEXT_PUBLIC_APP_URL` | Recommended | App URL for links |
+| `NEXT_PUBLIC_APP_URL` | Production | Public app URL for metadata, share links, emails, webhooks, sitemap |
+| `APP_URL` | Production | Server-side app URL (fallback if `NEXT_PUBLIC_APP_URL` unset) |
+| `PUBLIC_APP_URL` | No | Additional fallback for app URL resolution |
+| `ALLOWED_ORIGINS` | No | Comma-separated CORS origins (defaults to app URL in production) |
 | `OPENAI_API_KEY` | Conditional | Required when `MOCK_AI_MODE=false` |
 | `MOCK_AI_MODE` | No | Set to `true` for mock AI (default) |
 | `MAX_UPLOAD_MB` | No | Max upload size in MB (default: 10) |
@@ -499,6 +502,51 @@ API: `POST /api/admin/maintenance/cleanup-files` with `{ "dryRun": true }` or `{
 | `ADMIN_NAME` | No | Default admin name |
 | `ADMIN_EMAIL` | No | Default admin email |
 | `ADMIN_PASSWORD` | No | Default admin password (change for production) |
+
+### App URL (required for production)
+
+Set your production domain through environment variables — **never hardcode it in source code**:
+
+```env
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+APP_URL=https://your-domain.com
+```
+
+Example (documentation only — do not commit as active values):
+
+```env
+NEXT_PUBLIC_APP_URL=https://vaidya-gpt.com
+APP_URL=https://vaidya-gpt.com
+```
+
+Local development:
+
+```env
+NEXT_PUBLIC_APP_URL=http://localhost:7111
+APP_URL=http://localhost:7111
+```
+
+All generated links (password reset, email verification, share links, sitemap, metadata) use `lib/app-url.ts` (`getAppUrl()`, `absoluteUrl()`, `getBaseUrlFromRequest()`).
+
+Razorpay webhook URL (configure in Razorpay Dashboard):
+
+```text
+${APP_URL}/api/billing/razorpay/webhook
+```
+
+Run `npm run audit:urls` before deploy to verify no hardcoded production domains remain in source.
+
+### Hostinger deployment
+
+Push to GitHub and deploy to a Hostinger VPS in one step:
+
+```powershell
+copy .env.deploy.example .env.deploy
+# Edit .env.deploy with SSH host, user, and deploy path
+npm run deploy:hostinger -- "Deploy: describe changes"
+```
+
+See [docs/HOSTINGER-DEPLOY.md](docs/HOSTINGER-DEPLOY.md) for server setup, nginx, PM2, and troubleshooting.
 
 ### Production Checklist
 
@@ -871,11 +919,13 @@ NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxx
 
 ### Webhook (local)
 
-```bash
-ngrok http 7111
+Use a tunnel to your local dev server (port 7111). Register this webhook URL in Razorpay (derived from your env or tunnel origin):
+
+```text
+{APP_URL}/api/billing/razorpay/webhook
 ```
 
-Webhook URL: `https://YOUR-NGROK/api/billing/razorpay/webhook`
+Example with a tunnel: `https://YOUR-TUNNEL-HOST/api/billing/razorpay/webhook`
 
 ### Database migration
 
@@ -998,12 +1048,15 @@ Use ngrok to open the local app on a phone or share HTTPS links for demos. The a
 
 ### Share / invite / emergency links
 
-Doctor share links, caregiver invites, and emergency card URLs are built from the incoming request (`Origin`, `X-Forwarded-Host`, etc.), so links created while you are on ngrok use the ngrok domain automatically. Localhost still works when you develop locally.
+Doctor share links, caregiver invites, and emergency card URLs are built with `getBaseUrlFromRequest()` from the incoming request when env URLs are not set (e.g. tunnel testing). When `NEXT_PUBLIC_APP_URL` or `APP_URL` is set, those env values are used instead.
 
-Optional env fallbacks (only if headers are missing):
+Configure app URL in `.env`:
 
-- `NEXT_PUBLIC_PUBLIC_APP_URL` — preferred public URL
-- `NEXT_PUBLIC_APP_URL` — secondary fallback
+- `NEXT_PUBLIC_APP_URL` — public URL for client-visible links and metadata
+- `APP_URL` — server-side URL (optional if `NEXT_PUBLIC_APP_URL` is set)
+- `PUBLIC_APP_URL` — additional fallback
+
+Local default (development only, in `lib/app-url.ts`): `http://localhost:7111`
 
 ### PWA manifest was cached as HTML
 

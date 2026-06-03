@@ -8,6 +8,7 @@ import {
   isPaidPlanKey,
   type PaidPlanKey,
 } from "@/lib/billing/plan-billing";
+import { getAppUrl } from "@/lib/app-url";
 
 const RAZORPAY_API = "https://api.razorpay.com/v1";
 
@@ -120,6 +121,7 @@ export async function createRazorpayOrder(params: {
       notes: {
         userId: params.userId,
         plan: params.plan,
+        appUrl: getAppUrl(),
       },
     }),
   });

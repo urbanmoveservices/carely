@@ -11,6 +11,7 @@ import {
 } from "../lib/env";
 import { isOpenAiTranslationConfigured } from "../lib/translation/openai-translation-provider";
 import { getStorageRootPath } from "../lib/storage";
+import { isAppUrlConfigured } from "../lib/app-url";
 import { BRAND } from "../lib/brand";
 
 type Severity = "info" | "warning" | "blocker";
@@ -104,14 +105,14 @@ async function main(): Promise<number> {
     openAiOk ? undefined : "OPENAI_API_KEY missing"
   );
 
-  const appUrlOk = Boolean(process.env.NEXT_PUBLIC_APP_URL?.trim());
+  const appUrlOk = isAppUrlConfigured();
   if (prod) {
     push(
       checks,
       "app_url",
       "blocker",
       appUrlOk,
-      appUrlOk ? undefined : "NEXT_PUBLIC_APP_URL required in production"
+      appUrlOk ? undefined : "APP_URL or NEXT_PUBLIC_APP_URL required in production"
     );
   } else {
     push(checks, "app_url", "info", appUrlOk || true, appUrlOk ? undefined : "Using default localhost");

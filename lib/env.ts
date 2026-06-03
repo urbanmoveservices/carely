@@ -1,3 +1,5 @@
+import { isAppUrlConfigured } from "./app-url";
+
 export type EnvCheck = { key: string; ok: boolean; required: boolean; message?: string };
 
 export function isProduction(): boolean {
@@ -9,7 +11,6 @@ export function getRequiredProductionEnv(): string[] {
     "DATABASE_URL",
     "JWT_SECRET",
     "OPENAI_API_KEY",
-    "NEXT_PUBLIC_APP_URL",
   ];
 }
 
@@ -34,6 +35,17 @@ export function validateEnv(): EnvCheck[] {
       ok: Boolean(val),
       required: true,
       message: val ? undefined : "Missing",
+    });
+  }
+
+  if (isProduction()) {
+    checks.push({
+      key: "APP_URL",
+      ok: isAppUrlConfigured(),
+      required: true,
+      message: isAppUrlConfigured()
+        ? undefined
+        : "Set APP_URL or NEXT_PUBLIC_APP_URL",
     });
   }
 

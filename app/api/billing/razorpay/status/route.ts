@@ -3,6 +3,7 @@ import {
   isRazorpayConfigured,
   isRazorpayEnabled,
 } from "@/lib/billing/razorpay";
+import { absoluteUrl } from "@/lib/app-url";
 import { ok, serverError } from "@/lib/api-response";
 
 export async function GET() {
@@ -17,6 +18,7 @@ export async function GET() {
       configured,
       keyIdPresent: Boolean(keyId),
       currency,
+      webhookUrl: absoluteUrl("/api/billing/razorpay/webhook"),
       message: configured
         ? undefined
         : enabled

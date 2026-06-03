@@ -3,7 +3,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { ok, validationError, serverError } from "@/lib/api-response";
 import { createAuthToken } from "@/lib/auth-tokens";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 import { sendEmail } from "@/lib/email/send-email";
 import { createAccessLog, accessFromRequest, ACCESS_ACTIONS } from "@/lib/access-log";

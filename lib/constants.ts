@@ -1,9 +1,10 @@
 import { getAppDisplayName } from "@/lib/brand";
-import { getDefaultBaseUrl } from "./url";
+import { getAppUrl } from "@/lib/app-url";
 
 export const APP_NAME = getAppDisplayName();
 
-export const APP_URL = getDefaultBaseUrl();
+/** @deprecated Use getAppUrl() from @/lib/app-url */
+export const APP_URL = getAppUrl();
 
 export const UPLOAD_STATUSES = {
   UPLOADED: "uploaded",

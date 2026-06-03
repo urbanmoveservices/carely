@@ -12,7 +12,7 @@ import {
 } from "@/lib/rate-limit";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 import { createAuthToken } from "@/lib/auth-tokens";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { serializeUser } from "@/lib/user-serialize";
 
 const signupSchema = z.object({
@@ -70,8 +70,7 @@ export async function POST(req: NextRequest) {
       "email_verification",
       24 * 60
     );
-    const base = getBaseUrlFromRequest(req);
-    const verificationUrl = `${base}/verify-email/${verifyToken}`;
+    const verificationUrl = `${getBaseUrlFromRequest(req)}/verify-email/${verifyToken}`;
 
     const token = signToken({
       userId: user.id,

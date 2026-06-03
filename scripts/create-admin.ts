@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getAppUrl } from "../lib/app-url";
 
 const prisma = new PrismaClient();
 
@@ -30,7 +31,7 @@ async function main() {
     console.log(`[CARELY] Admin user created successfully.`);
   }
 
-  console.log(`\n  Admin Login:    http://localhost:7111/admin/login`);
+  console.log(`\n  Admin Login:    ${getAppUrl()}/admin/login`);
   console.log(`  Email:          ${email}`);
   console.log(`  Password:       (from .env ADMIN_PASSWORD)\n`);
 }

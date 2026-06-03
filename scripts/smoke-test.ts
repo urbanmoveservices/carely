@@ -117,7 +117,10 @@ async function main(): Promise<number> {
     (await fileExists(f)) ? pass(`asset_${f}`) : fail(`asset_${f}`, "missing");
   }
 
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7111";
+  const base =
+    process.env.SMOKE_BASE_URL?.trim() ||
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    "http://localhost:7111";
   const endpoints = [
     ["/api/billing/plans", true],
     ["/api/billing/razorpay/status", true],

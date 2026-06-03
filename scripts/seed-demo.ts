@@ -4,6 +4,7 @@
  */
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getAppUrl } from "../lib/app-url";
 import { DEMO_USER_EMAIL } from "../lib/user-serialize";
 import { getCurrentMonthKey } from "../lib/plans";
 
@@ -223,7 +224,7 @@ async function main() {
     console.log("Demo family data already exists — skipped recreate.");
   }
 
-  console.log(`\n  Demo login:  http://localhost:7111`);
+  console.log(`\n  Demo login:  ${getAppUrl()}`);
   console.log(`  Email:     ${DEMO_USER_EMAIL}`);
   console.log(`  Password:  ${DEMO_PASSWORD}`);
   console.log(`  Or use "Try Demo" on the landing page.\n`);

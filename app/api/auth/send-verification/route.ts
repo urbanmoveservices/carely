@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/family-auth";
 import { createAuthToken, invalidateAuthTokens } from "@/lib/auth-tokens";
-import { getBaseUrlFromRequest } from "@/lib/url";
+import { getBaseUrlFromRequest } from "@/lib/app-url";
 import { ok, fail, serverError } from "@/lib/api-response";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 import { sendEmail } from "@/lib/email/send-email";

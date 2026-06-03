@@ -18,13 +18,14 @@ import { LanguageReactiveBoundary } from "@/components/LanguageReactiveBoundary"
 import { FloatingChatButton } from "@/components/chat/FloatingChatButton";
 
 import { BRAND } from "@/lib/brand";
+import { absoluteUrl, getAppUrl } from "@/lib/app-url";
 
 import "./globals.css";
 
-
+const appUrl = getAppUrl();
 
 export const metadata: Metadata = {
-
+  metadataBase: new URL(appUrl),
   title: {
     default: `${BRAND.name} — Family Health Reports & Insights`,
     template: `%s | ${BRAND.name}`,
@@ -43,18 +44,25 @@ export const metadata: Metadata = {
   openGraph: {
     title: BRAND.name,
     description: BRAND.description,
-    url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7111",
+    url: appUrl,
     siteName: BRAND.name,
     locale: "en_IN",
     type: "website",
-    images: [{ url: "/brand/logo.png", width: 512, height: 512, alt: BRAND.logoAlt }],
+    images: [
+      {
+        url: absoluteUrl("/brand/logo.png"),
+        width: 512,
+        height: 512,
+        alt: BRAND.logoAlt,
+      },
+    ],
   },
 
   twitter: {
     card: "summary",
     title: BRAND.name,
     description: BRAND.description,
-    images: ["/brand/logo.png"],
+    images: [absoluteUrl("/brand/logo.png")],
   },
 
   robots: { index: true, follow: true },
