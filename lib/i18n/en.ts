@@ -120,6 +120,10 @@ export const en: Record<string, string> = {
   "dashboard.familyHealth": "Family Health",
   "dashboard.viewSummary": "View Summary",
   "dashboard.generateSummary": "Generate Summary",
+  "dashboard.pendingSummaryTitle": "Generate your AI summary",
+  "dashboard.pendingSummaryDesc":
+    "These reports are ready — create your personalized health summary now.",
+  "dashboard.pendingSummaryMore": "+ {count} more report(s) waiting",
   "dashboard.searchPlaceholder": "Search reports, family, reminders…",
   "dashboard.statTotal": "Total",
   "dashboard.statExtracted": "Extracted",
@@ -228,6 +232,9 @@ export const en: Record<string, string> = {
   "upload.supportedFormats": "PDF, JPG, PNG, or DOCX",
   "upload.uploadBtn": "Upload",
   "upload.goDashboard": "Go to Dashboard",
+  "upload.generateSummary": "Generate AI Summary",
+  "upload.successNextStep":
+    "Text extraction completed. Generate your AI summary now — no need to visit the dashboard first.",
 
   "family.title": "Family Health",
   "family.addMember": "Add Member",

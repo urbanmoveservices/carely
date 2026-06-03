@@ -15,6 +15,7 @@ import { subscribeDashboardRefresh } from "@/lib/dashboard-events";
 import { MonthlyUsageCard } from "@/components/dashboard/MonthlyUsageCard";
 import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
 import { OnboardingSetupCard } from "@/components/dashboard/OnboardingSetupCard";
+import { PendingSummaryPrompt } from "@/components/dashboard/PendingSummaryPrompt";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { useRouter } from "next/navigation";
@@ -148,6 +149,8 @@ function DashboardContent() {
             </div>
           </div>
         </div>
+
+        {!loading && <PendingSummaryPrompt docs={docs} />}
 
         <form
           className="mb-4 relative"

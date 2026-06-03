@@ -21,6 +21,7 @@ import {
   File,
   X,
   CheckCircle2,
+  Sparkles,
   Info,
   UploadCloud,
   Plus,
@@ -354,15 +355,30 @@ function UploadContent() {
                 {successMessage}
               </h3>
               <p className="text-sm text-gray-600 mb-4">
-                Text extraction completed. You can generate an AI summary next.
+                {t("upload.successNextStep")}
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Button onClick={() => router.push("/dashboard")}>
+                {docId && (
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() =>
+                      router.push(`/documents/${docId}/generate-summary`)
+                    }
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {t("upload.generateSummary")}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => router.push("/dashboard")}
+                >
                   {t("upload.goDashboard")}
                 </Button>
                 {docId && (
                   <Link href={`/documents/${docId}`}>
-                    <Button variant="outline" className="w-full sm:w-auto">
+                    <Button variant="ghost" className="w-full sm:w-auto">
                       View Document
                     </Button>
                   </Link>

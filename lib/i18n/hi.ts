@@ -75,6 +75,10 @@ export const hi: Record<string, string> = {
   "dashboard.familyHealth": "परिवार स्वास्थ्य",
   "dashboard.viewSummary": "सारांश देखें",
   "dashboard.generateSummary": "सारांश बनाएं",
+  "dashboard.pendingSummaryTitle": "अपना AI सारांश बनाएं",
+  "dashboard.pendingSummaryDesc":
+    "ये रिपोर्ट तैयार हैं — अभी अपना व्यक्तिगत स्वास्थ्य सारांश बनाएं।",
+  "dashboard.pendingSummaryMore": "+ {count} और रिपोर्ट प्रतीक्षा में",
   "dashboard.searchPlaceholder": "रिपोर्ट, परिवार, रिमाइंडर खोजें…",
   "dashboard.statTotal": "कुल",
   "dashboard.statExtracted": "निकाला गया",
@@ -179,6 +183,9 @@ export const hi: Record<string, string> = {
   "upload.supportedFormats": "PDF, JPG, PNG, या DOCX",
   "upload.uploadBtn": "अपलोड",
   "upload.goDashboard": "डैशबोर्ड पर जाएं",
+  "upload.generateSummary": "AI सारांश बनाएं",
+  "upload.successNextStep":
+    "टेक्स्ट निकाला गया। अभी AI सारांश बनाएं — डैशबोर्ड पर जाने की जरूरत नहीं।",
 
   "family.title": "परिवार स्वास्थ्य",
   "family.addMember": "सदस्य जोड़ें",
