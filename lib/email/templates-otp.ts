@@ -1,4 +1,9 @@
-import { PRODUCT_NAME, COMPANY_NAME, getSupportEmail } from "@/lib/company";
+import { PRODUCT_NAME, getSupportEmail } from "@/lib/company";
+import { otpCodeBlock, wrapBrandedEmailHtml } from "@/lib/email/email-layout";
+import {
+  logoAttachmentForNodemailer,
+  resolveEmailLogo,
+} from "@/lib/email/logo-attachment";
 
 export type OtpEmailKind = "email_verification" | "password_reset";
 
@@ -9,41 +14,54 @@ export function renderOtpEmail(params: {
   expiryMinutes: number;
 }): { subject: string; html: string; text: string } {
   const support = getSupportEmail();
+  const logo = resolveEmailLogo();
+  const greeting = params.name && params.name !== "there" ? params.name : "there";
+
   const subject =
     params.kind === "email_verification"
       ? `Your ${PRODUCT_NAME} verification code`
       : `Your ${PRODUCT_NAME} password reset code`;
 
+  const headline =
+    params.kind === "email_verification"
+      ? "Verify your email"
+      : "Reset your password";
+
   const intro =
     params.kind === "email_verification"
-      ? `Hi ${params.name}, use this code to verify your email for ${PRODUCT_NAME}:`
-      : `Hi ${params.name}, use this code to reset your ${PRODUCT_NAME} password:`;
+      ? `Hi ${greeting}, enter this code on ${PRODUCT_NAME} to verify your email address.`
+      : `Hi ${greeting}, enter this code on ${PRODUCT_NAME} to reset your password.`;
 
-  const footer = `${PRODUCT_NAME}
-Operated by ${COMPANY_NAME}
-Support: ${support}`;
+  const preheader = `${params.code} is your ${PRODUCT_NAME} code (expires in ${params.expiryMinutes} minutes)`;
 
-  const html = `<!DOCTYPE html>
-<html>
-<body style="font-family: Arial, sans-serif; color: #111; line-height: 1.5;">
-  <p>${intro}</p>
-  <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 24px 0;">${params.code}</p>
-  <p>This code expires in <strong>${params.expiryMinutes} minutes</strong>.</p>
-  <p>If you did not request this, you can safely ignore this email.</p>
-  <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-  <p style="font-size: 12px; color: #666; white-space: pre-line;">${footer}</p>
-</body>
-</html>`;
+  const bodyHtml = `
+    <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#0f172a;">${headline}</h1>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#334155;">${intro}</p>
+    ${otpCodeBlock(params.code, params.expiryMinutes)}`;
 
-  const text = `${intro}
+  const html = wrapBrandedEmailHtml({
+    logo,
+    preheader,
+    title: subject,
+    bodyHtml,
+  });
 
-${params.code}
+  const text = `${headline}
+
+${intro}
+
+Your code: ${params.code}
 
 This code expires in ${params.expiryMinutes} minutes.
 
 If you did not request this, you can safely ignore this email.
 
-${footer}`;
+${PRODUCT_NAME}
+Support: ${support}`;
 
   return { subject, html, text };
+}
+
+export function getOtpEmailAttachments() {
+  return logoAttachmentForNodemailer(resolveEmailLogo());
 }

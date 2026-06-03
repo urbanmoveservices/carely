@@ -1,5 +1,5 @@
 import { sendEmail } from "@/lib/email/send-email";
-import { renderOtpEmail } from "@/lib/email/templates-otp";
+import { renderOtpEmail, getOtpEmailAttachments } from "@/lib/email/templates-otp";
 import { getOtpExpiresMinutes } from "@/lib/auth/otp";
 
 export async function sendEmailVerificationOtp(params: {
@@ -7,7 +7,7 @@ export async function sendEmailVerificationOtp(params: {
   name: string;
   code: string;
   userId?: string | null;
-}): Promise<{ ok: boolean; preview?: boolean }> {
+}): Promise<{ ok: boolean; preview?: boolean; error?: string }> {
   const { subject, html, text } = renderOtpEmail({
     kind: "email_verification",
     name: params.name,
@@ -23,9 +23,10 @@ export async function sendEmailVerificationOtp(params: {
     subject,
     html,
     text,
+    attachments: getOtpEmailAttachments(),
   });
 
-  return { ok: result.ok, preview: result.preview };
+  return { ok: result.ok, preview: result.preview, error: result.error };
 }
 
 export async function sendPasswordResetOtp(params: {
@@ -33,7 +34,7 @@ export async function sendPasswordResetOtp(params: {
   name: string;
   code: string;
   userId?: string | null;
-}): Promise<{ ok: boolean; preview?: boolean }> {
+}): Promise<{ ok: boolean; preview?: boolean; error?: string }> {
   const { subject, html, text } = renderOtpEmail({
     kind: "password_reset",
     name: params.name,
@@ -49,7 +50,8 @@ export async function sendPasswordResetOtp(params: {
     subject,
     html,
     text,
+    attachments: getOtpEmailAttachments(),
   });
 
-  return { ok: result.ok, preview: result.preview };
+  return { ok: result.ok, preview: result.preview, error: result.error };
 }

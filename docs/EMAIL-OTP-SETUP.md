@@ -18,6 +18,17 @@ See `.env.example` for:
 
 If SMTP is not configured in development, signup and auth still work; the server logs `Email not sent: SMTP not configured`.
 
+**Required for real delivery:** `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM` must all be set. The app uses **nodemailer** with STARTTLS (port 587) or SSL (port 465).
+
+Test SMTP from the server:
+
+```bash
+cd /var/www/carely
+npm run test:smtp -- your-email@gmail.com
+```
+
+Check failures in Admin → Email logs or `pm2 logs vaidya-gpt`.
+
 ## Deliverability (production)
 
 Configure your SMTP provider (Zoho Mail, Resend, Amazon SES, Mailgun, Brevo, Gmail Workspace, etc.) and add DNS records for your sending domain:

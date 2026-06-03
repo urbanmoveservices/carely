@@ -1,7 +1,10 @@
 import prisma from "@/lib/prisma";
 import { isSmtpConfigured } from "./provider";
 import { renderEmailTemplate, type EmailTemplateType } from "./templates";
-import { getDefaultFromAddress } from "./config";
+import nodemailer from "nodemailer";
+import { sendSmtpMessage } from "./smtp";
+
+type MailAttachment = NonNullable<nodemailer.SendMailOptions["attachments"]>[number];
 
 export async function sendEmail(params: {
   to: string;
@@ -11,11 +14,13 @@ export async function sendEmail(params: {
   subject?: string;
   html?: string;
   text?: string;
-}): Promise<{ ok: boolean; preview?: boolean; logId: string }> {
+  attachments?: MailAttachment[];
+}): Promise<{ ok: boolean; preview?: boolean; logId: string; error?: string }> {
   const rendered = renderEmailTemplate(params.type, params.data);
   const subject = params.subject ?? rendered.subject;
   const html = params.html ?? rendered.html;
   const text = params.text ?? rendered.text;
+
   const log = await prisma.emailLog.create({
     data: {
       userId: params.userId ?? null,
@@ -27,7 +32,7 @@ export async function sendEmail(params: {
   });
 
   if (!isSmtpConfigured()) {
-    console.info(`[email:dev] To: ${params.to} | ${subject}`);
+    console.info(`[email:dev] Email not sent: SMTP not configured → ${params.to} | ${subject}`);
     await prisma.emailLog.update({
       where: { id: log.id },
       data: { status: "sent", sentAt: new Date() },
@@ -36,7 +41,13 @@ export async function sendEmail(params: {
   }
 
   try {
-    await sendViaSmtp({ to: params.to, subject, html, text });
+    await sendSmtpMessage({
+      to: params.to,
+      subject,
+      html,
+      text,
+      attachments: params.attachments,
+    });
     await prisma.emailLog.update({
       where: { id: log.id },
       data: { status: "sent", sentAt: new Date() },
@@ -44,52 +55,11 @@ export async function sendEmail(params: {
     return { ok: true, logId: log.id };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Send failed";
+    console.error(`[email] SMTP send failed to ${params.to}:`, message);
     await prisma.emailLog.update({
       where: { id: log.id },
       data: { status: "failed", error: message.slice(0, 500) },
     });
-    return { ok: false, logId: log.id };
+    return { ok: false, logId: log.id, error: message };
   }
-}
-
-async function sendViaSmtp(payload: {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
-}): Promise<void> {
-  const host = process.env.SMTP_HOST!;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const from = getDefaultFromAddress();
-  const body = [
-    `From: ${from}`,
-    `To: ${payload.to}`,
-    `Subject: ${payload.subject}`,
-    "MIME-Version: 1.0",
-    "Content-Type: text/html; charset=utf-8",
-    "",
-    payload.html,
-  ].join("\r\n");
-
-  const net = await import("net");
-  const tls = port === 465 ? await import("tls") : null;
-
-  await new Promise<void>((resolve, reject) => {
-    const onConnect = () => {
-      socket.write(`EHLO carely\r\n`);
-      socket.write(`MAIL FROM:<${from}>\r\n`);
-      socket.write(`RCPT TO:<${payload.to}>\r\n`);
-      socket.write(`DATA\r\n`);
-      socket.write(`${body}\r\n.\r\n`);
-      socket.write(`QUIT\r\n`);
-      socket.end();
-      resolve();
-    };
-    const socket = tls
-      ? tls.connect({ port, host, servername: host }, onConnect)
-      : net.createConnection(port, host, onConnect);
-    socket.on("error", reject);
-  });
 }

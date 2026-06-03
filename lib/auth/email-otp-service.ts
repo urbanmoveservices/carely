@@ -127,20 +127,27 @@ export async function createAndSendEmailOtp(params: {
   rememberTestOtp(email, params.type, code);
 
   const displayName = params.name?.trim() || "there";
-  if (params.type === "email_verification") {
-    await sendEmailVerificationOtp({
-      to: email,
-      name: displayName,
-      code,
-      userId: params.userId ?? null,
-    });
-  } else {
-    await sendPasswordResetOtp({
-      to: email,
-      name: displayName,
-      code,
-      userId: params.userId ?? null,
-    });
+  const sendResult =
+    params.type === "email_verification"
+      ? await sendEmailVerificationOtp({
+          to: email,
+          name: displayName,
+          code,
+          userId: params.userId ?? null,
+        })
+      : await sendPasswordResetOtp({
+          to: email,
+          name: displayName,
+          code,
+          userId: params.userId ?? null,
+        });
+
+  if (!sendResult.ok && isSmtpConfigured()) {
+    return {
+      ok: false,
+      code: "EMAIL_SEND_FAILED",
+      message: "Could not send email. Check SMTP settings or try again shortly.",
+    };
   }
 
   if (shouldDevPrintOtp()) {
