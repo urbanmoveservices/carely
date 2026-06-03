@@ -1,0 +1,10 @@
+--- Page 1 ---
+LABORATORY REPORT
+Analyse Name    Current Value    Units    Reference Range
+TSH Ultrasensitive    11.400    µIU/mL    0.27 - 4.20
+LDL Cholesterol Direct    113    mg/dL    < 100
+Direct Bilirubin    0.30    mg/dL    Up to 0.20
+PCV    38.60    %    40 - 50
+Glucose Fasting    88.70    mg/dL    70 - 100
+HbA1c    5.0    %    4.0 - 5.6
+Hemoglobin    13.5    g/dL    13.0 - 17.0

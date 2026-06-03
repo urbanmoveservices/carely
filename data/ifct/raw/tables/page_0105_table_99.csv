@@ -1,0 +1,22 @@
+,,,,,,,,Alpha,Beta,Gamma,Delta,Alpha,Beta Gamma,,,
+,,,,,,,µg,,,,,mg,,,,µg
+,,,,,,,ERGCAL,TOCPHA,TOCPHB,TOCPHG,TOCPHD,TOCTRA,TOCTRB TOCTRG,TOCTRD,VITE,VITK1
+C030,Pumpkin leav,"es, te",n,der (Cucurb,ita maxima),6,3.19±0.18,1.24±0.04,0.28±0.01,3.25±0.10,,0.02±0.01,0.03±0.01,,1.69±0.05,243±11.1
+C031,Radish leave,s (Ra,ph,anus sativus,),6,1.39±0.08,0.06±0.02,0.04±0.03,,,,,,0.08±0.03,185±3.3
+C032,Rumex leave,s (Ru,me,x patientia),,2,0.10,0.46,0.03,0.45,0.18,,,,0.51,126
+C033,Spinach (Spin,acia,ole,racea),,6,0.26±0.03,1.27±0.03,0.01±0.01,0.06±0.00,0.03±0.00,,,,1.29±0.02,325±2.3
+C034,Tamarind lea,"ves, t",en,der (Tamari,ndus indica),3,2.62±0.00,0.69±0.03,,1.18±0.25,,,,,0.81±0.01,249±6.6
+,,,,,,,,,,,,,,,,
+D,OTHER V,EGE,T,ABLES,,,,,,,,,,,,
+D001,Ash gourd (B,eninc,as,a hispida),,6,1.35±0.18,0.01±0.00,,0.13±0.02,,,,,0.02±0.01,27.15±0.45
+D002,Bamboo sho,"ot, ten",d,er (Bambus,a vulgaris),1,0.41,,,0.01,0.05,,,,,1.13
+D003,"Bean scarlet,",tend,er,(Phaseolus,coccineus),5,1.40±0.17,0.15±0.03,,,,,,,0.15±0.03,60.10±3.36
+D004,"Bitter gourd, elongate (Mo",jagge mordi,"d, ca",teeth ridge charantia),"s,",6,1.92±0.28,0.01±0.01,0.03±0.01,,,,0.11±0.01,0.07±0.03,0.03±0.01,4.55±0.36
+D005,"Bitter gourd, (Momordica c",jagge harant,"d, ia)",teeth ridge,"s, short",4,1.90±0.15,0.01±0.00,0.04±0.01,,,,0.11±0.02,0.08±0.03,0.03±0.00,4.85±0.35
+D006,"Bitter gourd, elongate (Mo",jagge mordi,"d, ca",smooth rid charantia),"ges,",1,1.83,0.01,0.03,,,,0.09,0.10,0.03,4.70
+D007,"Bottle gourd, (Lagenaria vul",elon garis),ga,"te, pale gre",en,6,0.74±0.02,0.01±0.01,,,,0.02±0.01,,,0.02±0.01,2.10±0.23
+D008,"Bottle gourd, (Lagenaria vul",roun garis),"d,",pale green,,5,0.70±0.04,0.01±0.00,,,,0.03±0.01,,,0.01±0.00,2.06±0.36
+D009,"Bottle gourd, (Lagenaria vul",elon garis),ga,"te, dark gre",en,1,0.60,0.01,,,,0.02,,,0.02,1.80
+D010,Brinjal-1 (Sol,anum,m,elongena),,1,0.85,0.08,,,,,,,0.08,10.30
+D011,Brinjal-2 (Sol,anum,m,elongena),,1,1.01,0.11,,,,,,,0.11,11.45
+D012,Brinjal-3 (Sol,anum,m,elongena),,2,1.19,0.09,,,,,,,0.09,12.25

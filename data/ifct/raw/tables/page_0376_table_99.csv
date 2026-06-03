@@ -1,0 +1,23 @@
+,,,,,,,,mg,,,
+,,,,,,,,,,,
+,,,,,,,,GALLAC,,,
+A019,"Wheat flour,",atta (Triticum,aestivum),6,0.68±0.19,0.62±0.11,0.26±0.08,2.79±0.37,,0.38±0.09,0.78±0.07
+A020,"Wheat, whol",e (Triticum aes,tivum),6,0.71±0.14,0.74±0.35,0.40±0.31,2.44±0.25,,0.67±0.15,0.68±0.12
+A021,"Wheat, bulg",ur (Triticum ae,stivum),6,0.68±0.10,0.71±0.12,0.40±0.09,2.75±0.62,,0.63±0.07,0.66±0.13
+A022,"Wheat, semo",lina (Triticum,aestivum),6,0.25±0.05,0.12±0.01,0.18±0.05,0.23±0.07,,0.05±0.02,0.14±0.02
+A023,"Wheat, verm",icelli (Triticum,aestivum),6,0.21±0.03,0.04±0.03,0.15±0.05,0.11±0.02,,0.04±0.01,0.02±0.01
+A024,"Wheat, verm aestivum)","icelli, roasted",(Triticum,6,0.20±0.04,0.02±0.01,0.07±0.03,0.06±0.01,,0.02±0.01,0.03±0.01
+,,,,,,,,,,,
+B,GRAIN L,EGUMES,,,,,,,,,
+B001,Bengal gram,", dal (Cicer ar",ietinum),6,0.02±0.01,0.02±0.01,,,,,0.69±0.03
+B002,Bengal gram,", whole (Cice",r arietinum),6,0.11±0.02,0.02±0.01,,,,,5.63±0.34
+B003,"Black gram,",dal (Phaseolu,s mungo),6,,,0.06±0.02,,,0.59±0.10,
+B004,"Black gram,",whole (Phase,olus mungo),6,,,0.48±0.11,,,4.06±0.58,
+B005,"Cowpea, bro",wn (Vigna cat,jang),6,,,,,,0.45±0.09,0.28±0.12
+B006,"Cowpea, whi",te (Vigna catj,ang),1,,,,,,0.52,0.41
+B007,"Field bean, b",lack (Phaseo,lus vulgaris),1,3.18,,,,,3.87,0.59
+B008,"Field bean, b",rown (Phase,olus vulgaris),1,2.67,,,,,2.68,0.64
+B009,"Field bean,",white (Phaseo,lus vulgaris),5,2.56±0.30,,,,,3.97±1.00,0.60±0.14
+B010,"Green gram,",dal (Phaseolu,s aureus),6,,,0.75±0.15,,,1.54±0.22,
+B011,"Green gram,",whole (Phas,eolus aureus),6,,,2.31±0.45,,,4.06±0.64,
+B012,"Horse gram,",whole (Dolicu,s biflorus),6,,4.61±0.46,,,,,0.39±0.17

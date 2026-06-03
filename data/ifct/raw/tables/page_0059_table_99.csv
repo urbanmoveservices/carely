@@ -1,0 +1,23 @@
+,,,,,g,,,KJ
+,,,,,,,,
+,,,,WATER,PROTCNT,ASH,FATCE,ENERC
+N005,"Poultry, chi","cken, liver",1,73.20,21.57,1.11,4.08,518
+N006,"Poultry, chi","cken, gizzard",1,78.05,18.22,1.46,2.07,386
+N007,Country hen,", leg, with skin",1,70.02,17.01,1.20,11.73,723
+N008,Country hen,", thigh, with skin",1,67.46,18.29,1.23,12.82,785
+N009,Country hen,", breast, with skin",1,66.53,22.08,1.14,10.20,753
+N010,Country hen,", wing, with skin",1,68.01,18.65,1.14,12.09,764
+N011,"Duck, meat,",with skin,1,73.49,19.07,1.22,6.03,547
+N012,"Emu, meat,",skinless,1,71.65,22.65,0.98,4.62,556
+N013,Guinea fowl,", meat, with skin",1,75.21,20.52,0.92,3.24,469
+N014,"Pigeon, mea","t, with skin",1,74.61,17.94,1.32,6.03,528
+N015,"Quail, meat,",skinless,1,71.58,20.92,1.35,5.95,576
+N016,"Turkey, leg,",with skin,1,69.24,20.30,1.21,8.15,647
+N017,"Turkey, thig","h, with skin",1,72.17,20.46,0.97,6.31,581
+N018,"Turkey, brea","st, with skin",1,68.44,21.96,1.01,8.04,671
+N019,"Turkey, win","g, with skin",1,66.16,21.91,0.97,10.77,771
+O,ANIMAL,MEAT,,,,,,
+O001,"Goat, shoul",der,6,66.39±0.40,20.33±0.50,0.90±0.02,11.94±0.78,787±33
+O002,"Goat, chops",,6,72.46±1.10,20.39±0.83,0.99±0.01,5.98±0.37,568±26
+O003,"Goat, legs",,6,68.85±0.86,22.07±0.63,0.97±0.03,7.94±0.62,669±26
+O004,"Goat, brain",,5,76.74±1.02,13.82±0.80,1.29±0.07,8.06±0.46,533±23

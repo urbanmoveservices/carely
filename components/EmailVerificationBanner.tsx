@@ -1,0 +1,72 @@
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "./AuthProvider";
+import { api } from "@/lib/api-client";
+import { Alert } from "./ui/Alert";
+import { Button } from "./ui/Button";
+import { X, Mail } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/use-translation";
+
+export function EmailVerificationBanner() {
+  const { user, refreshUser } = useAuth();
+  const { t } = useTranslation();
+  const [dismissed, setDismissed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [devLink, setDevLink] = useState<string | null>(null);
+  const [msg, setMsg] = useState("");
+
+  if (!user || user.emailVerified || dismissed || user.role === "admin") {
+    return null;
+  }
+
+  const send = async () => {
+    setLoading(true);
+    setMsg("");
+    try {
+      const res = await api.sendVerification();
+      setMsg(res.message);
+      if (res.verificationUrl) setDevLink(res.verificationUrl);
+      await refreshUser();
+    } catch (e: unknown) {
+      setMsg(e instanceof Error ? e.message : "Failed to send");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Alert variant="info" className="mb-4 relative">
+      <button
+        type="button"
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+        onClick={() => setDismissed(true)}
+        aria-label="Dismiss"
+      >
+        <X className="h-4 w-4" />
+      </button>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 pr-6">
+        <div className="flex items-start gap-2 flex-1">
+          <Mail className="h-5 w-5 text-brand-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-gray-900">
+              {t("dashboard.verifyEmail")}
+            </p>
+            {msg && <p className="text-sm mt-1 text-gray-600">{msg}</p>}
+            {devLink && (
+              <a
+                href={devLink}
+                className="text-sm text-brand-700 underline break-all mt-1 block"
+              >
+                Dev verification link
+              </a>
+            )}
+          </div>
+        </div>
+        <Button size="sm" onClick={send} loading={loading} className="shrink-0">
+          {t("dashboard.sendVerificationLink")}
+        </Button>
+      </div>
+    </Alert>
+  );
+}

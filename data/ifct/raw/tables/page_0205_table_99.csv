@@ -1,0 +1,21 @@
+,,,,mgg,,mg,mg,mg,mg,mg,mg,mg,mg
+,,,,AL,AS,CD,CA,CR,CO,CU,FE,PB,LI
+R,MARINE MOLLUSKS,,,,,,,,,,,,
+R001,"Clam, green s h e l l (Perna virid",is ),1,,,0.008,121,0.104,0.027,0.25,1.01,,
+R002,"Clam, white shell, ribbed (Me meretrix)",retrix,1,,,0.012,50.00,0.123,0.031,0.31,0.94,,0.004
+R003,Octopus (Octopus vulgaris),,1,0.10,0.34,0.015,22.10,0.011,0.035,6.72,1.08,,
+R004,"Squid, black (Loligo sp.)",,1,0.16,0.47,0.004,22.98,0.005,0.001,1.09,0.50,0.023,0.003
+R005,"Squid, hard s h e l l (Sepia phar",aonis),1,,,0.004,8.73,0.006,,0.10,0.62,0.001,0.002
+R006,"Squid, red (Loligo duvaucelii)",,2,,,0.003,14.15,0.027,,0.15,0.26,,0.007
+R007,"Squid, white, small (Uroteuthis duvauceli)",,1,0.08,0.85,0.005,36.46,0.007,0.009,1.10,0.39,0.022,0.003
+S,FRESHWATER FISH,AND S,HELL,FISH,,,,,,,,,
+S001,Cat fish (Tandanus tandanus),,2,0.48±0.17,1.68±0.71,,21.99±8.75,0.008±0.002,,0.03±0.01,0.82±0.19,0.012±0.001,
+S002,Catla (Catla catla),,6,0.41±0.13,7.70±3.37,,43.53±3.91,0.017±0.002,0.003±0.003,0.06±0.02,1.14±0.35,0.005±0.003,
+S003,Freshwater E e l (Anguilla angu,illa),1,0.81,1.81,0.004,52.99,0.069,,2.72,1.54,0.606,
+S004,Gold fish (Carassius auratus),,2,0.27,2.84,,47.89,0.01,,0.03,0.76,,
+S005,Pangas (Pangasianodon hypophthalmus),,6,0.38±0.20,2.22±1.06,0.001±0.000,11.19±1.58,0.009±0.003,,0.04±0.01,0.69±0.16,0.004±0.000,
+S006,Rohu (Labeo rohita),,6,0.48±0.10,3.71±1.29,,39.37±5.44,0.009±0.005,0.003±0.003,0.05±0.02,1.04±0.34,0.014±0.003,
+S007,Crab (Pachygrapsus sp.),,1,0.49,1.74,0.030,199,0.016,0.001,0.52,1.10,,0.006
+S008,"Prawns, big (Macrobrachium rosenbergii)",,1,0.95,3.02,0.003,48.55,0.008,,0.69,0.78,,
+S009,"Prawns, sm a l l (Macrobrachium",sp.),3,0.91,8.14,,67.99,0.007,0.001,0.14,0.87,,0.001
+S010,Tiger praw n s (Macrobrachium,sp.),2,0.36,4.77,0.002,57.90,0.007,,0.39,0.84,,0.003

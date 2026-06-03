@@ -1,0 +1,22 @@
+,,,,,,,mg,,,,
+,,,,,,,,,,,
+,,,,F20D4N6,F20D5N3,F22D5N3,F22D6N3,FASAT,FAMS,FAPU,CHOLC
+R,MARINE,MOLLUSKS,,,,,,,,,
+R001,"Clam, green",shell (Perna viridis ),1,41.76,80.79,9.94,108,285,92.24,263,43.74
+R002,"Clam, white","shell, ribbed (Meretrix meretrix)",1,47.16,85.90,21.13,217,441,127,418,23.98
+R003,Octopus (O,ctopus vulgaris),1,121,72.24,,181,325,69.95,383,118
+R004,"Squid, black",(Loligo sp.),1,47.53,70.73,,261,287,56.42,388,231
+R005,"Squid, hard",shell (Sepia pharaonis),1,57.49,48.52,14.05,178,227,61.67,303,60.32
+R006,"Squid, red (",Loligo duvaucelii),2,72.08,82.28,29.27,342,448,83.36,545,126
+R007,"Squid, white",", small (Uroteuthis duvauceli)",1,67.70,95.50,,269,304,62.57,441,324
+S,FRESH,WATER FISH AND SHELL,FISH,,,,,,,,
+S001,Cat fish (Ta,ndanus tandanus),2,80.31±46.30,78.77±14.57,,140±58,2182±1422,2055±1457,978±519,84.01±8.02
+S002,Catla (Catla,catla),6,120±72.8,123±65.2,,242±98.5,1670±137,1237±106,815±362,64.42±4.06
+S003,Freshwater,Eel (Anguilla anguilla),1,137,17.91,,119,981,733,600,58.64
+S004,Gold fish (C,arassius auratus),2,130,69.13,,73.36,1077,625,0.85,
+S005,Pangas (Pa,ngasianodon hypophthalmus),6,66.70±12.72,42.15±13.34,,106±33.7,863±338,714±240,510±103,66.89±1.40
+S006,Rohu (Labe,o rohita),6,53.52±15.00,23.61±18.53,,46.72±11.33,2047±1113,2618±857,747±181,47.72±3.94
+S007,Crab (Pachy,grapsus sp.),1,49.09,82.64,,108,214,140,256,52.91
+S008,"Prawns, big",(Macrobrachium rosenbergii),1,17.87,27.14,,27.94,86.86,56.77,94.61,87.28
+S009,"Prawns, sm",all(Macrobrachium sp.),3,39.35,58.02,,12.73,197,152,166,112
+S010,Tiger prawn,s (Macrobrachium sp.),2,53.06,36.11,,17.38,134,120,136,78.87

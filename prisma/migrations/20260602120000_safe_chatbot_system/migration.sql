@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "UsageCounter" ADD COLUMN IF NOT EXISTS "chatMessagesUsed" INTEGER NOT NULL DEFAULT 0;

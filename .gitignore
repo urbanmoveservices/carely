@@ -1,0 +1,6 @@
+node_modules/
+.next/
+test-results/
+.env
+storage/uploads/*
+!storage/uploads/.gitkeep

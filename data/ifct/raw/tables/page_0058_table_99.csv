@@ -1,0 +1,24 @@
+edoC dooF,Fo,fo od Name .oN,snoigeR,Moisture,Protein,Ash,Total Fat,Energy
+,,,,,g,,,KJ
+,,,,,,,,
+,,,,WATER,PROTCNT,ASH,FATCE,ENERC
+M,EGG AND EG,G PRODUCTS,,,,,,
+M001,"Egg, poultry, whol","e, raw",6,76.51±0.20,13.28±0.29,0.81±0.04,9.15±0.14,564±3
+M002,"Egg, poultry, whit","e, raw",6,86.68±0.11,10.84±0.07,0.75±0.03,0.06±0.01,187±1
+M003,"Egg, poultry, yolk,",raw,6,53.57±0.40,15.74±0.33,1.05±0.05,26.34±0.17,1242±9
+M004,"Egg, poultry, whol","e, boiled",6,73.46±0.22,13.43±0.28,0.86±0.04,10.54±0.19,618±6
+M005,"Egg, poultry, whit","e, boiled",6,83.54±0.18,12.37±0.16,0.81±0.04,0.26±0.02,220±3
+M006,"Egg, poultry, yolk,",boiled,6,51.42±0.22,16.13±0.45,1.38±0.14,27.46±0.24,1290±8
+M007,"Egg, poultry, omle",t,3,68.48±0.13,16.53±0.43,0.96±0.03,11.60±0.22,710±4
+M008,"Egg, country hen,","whole, raw",1,72.96,13.14,0.86,13.00,704
+M009,"Egg, country hen,","whole, boiled",1,70.43,14.43,0.94,14.10,767
+M010,"Egg, country hen,",omlet,1,67.80,14.80,1.08,16.30,855
+M011,"Egg, duck, whole,",boiled,1,71.61,13.80,0.97,13.61,738
+M012,"Egg, duck, whole,",raw,1,70.53,14.60,0.99,13.83,760
+M013,"Egg, duck, whole,",omlet,1,68.90,15.10,1.18,14.80,804
+M014,"Egg, quial, whole,",raw,1,75.11,12.39,0.94,11.46,635
+M015,"Egg, quial, whole,",boiled,1,74.41,13.03,0.99,11.50,647
+N,POULTRY,,,,,,,
+N001,"Chicken, poultry, l","eg, skinless",4,67.61±0.30,19.44±0.79,1.14±0.08,12.64±0.53,1605±23
+N002,"Chicken, poultry, t","high, skinless",6,67.58±0.46,18.18±0.57,1.14±0.10,14.23±0.84,836±38
+N003,"Chicken, poultry,","breast, skinless",5,67.15±0.18,21.81±0.81,1.19±0.09,9.00±0.52,704±24

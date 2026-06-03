@@ -1,0 +1,21 @@
+,,,,µg,,mg,,µg
+,,,RETOL,CHOCAL,,TOCPHA TOCPHB TOCPHG TOCPHD TOCTRA TOCTRB TOCTRG TOCTRD,VITE,VITK2
+Q006,Oyster (Crassostrea sp.),1,25.36,0.82,0.04,1.11,1.11,1.72
+Q007,"Tiger prawns, brown (Solenocera crassicornis)",1,1.24,1.18,0.35,3.04,3.04,297
+Q008,"Tiger Prawns, orange (Penaeus monodon)",1,6.55,1.62,0.63,2.87,2.87,2.32
+,,,,,,,,
+R,MARINE MOLLUSKS,,,,,,,
+R001,"Clam, green shell(Perna viridis )",1,29.04,0.86,0.07,2.70,2.70,1.48
+R002,"Clam, white shell, ribbed (Meretrix meretrix)",1,8.50,2.08,0.10,1.21,1.21,1.53
+R003,Octopus (Octopus vulgaris),1,28.00,0.43,0.24,0.66,0.66,0.84
+R004,"Squid, black (Loligo sp.)",1,2.55,0.57,0.32,0.68,0.68,1.14
+R005,"Squid, hard shell(Sepia pharaonis)",1,1.93,0.78,0.22,0.55,0.55,2.26
+R006,"Squid, red(Loligo duvaucelii)",2,4.72,1.05,0.18,0.47,0.47,1.14
+R007,"Squid, white, small (Uroteuthis duvauceli)",1,8.55,0.55,0.16,0.66,0.66,1.84
+S,FRESHWATER FISH AND S,HEL,LFISH,,,,,
+S001,Cat fish (Tandanus tandanus),2,13.59±0.70,1.37±0.12,0.11±0.02,0.38±0.00,0.38±0.00,0.96±0.00
+S002,Catla(Catla catla),6,4.32±0.78,1.90±0.19,0.16±0.04,2.35±0.00,2.35±0.00,1.12±0.02
+S003,Freshwater Eel(Anguilla anguilla),1,866,3.81,0.57,1.80,1.80,1.23
+S004,Gold fish (Carassius auratus),2,22.95,0.21,0.07,2.10,2.10,1.26
+S005,Pangas (Pangasianodon hypophthalmus),6,14.59±0.00,0.20±0.04,0.08±0.04,2.80±0.00,2.80±0.00,0.92±0.07
+S006,Rohu(Labeo rohita),6,3.87±0.94,0.84±0.11,0.17±0.03,2.40±0.00,2.40±0.00,1.03±0.24

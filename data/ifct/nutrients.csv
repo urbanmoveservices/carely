@@ -1,0 +1,106 @@
+code,name,category,unit,original_column,isMacro,isVitamin,isMineral
+moisture,Moisture,proximate,g,Moisture,True,False,False
+protein,Protein,proximate,g,Protein,True,False,False
+ash,Ash,proximate,g,Ash,True,False,False
+total_fat,Total Fat,proximate,g,Total Fat,True,False,False
+total_dietary_fiber,Total Dietary Fiber,proximate,g,Total Dietary Fiber,True,False,False
+insoluble_dietary_fiber,Insoluble Dietary Fiber,proximate,g,Insoluble Dietary Fiber,False,False,False
+soluble_dietary_fiber,Soluble Dietary Fiber,proximate,g,Soluble Dietary Fiber,False,False,False
+carbohydrate,Carbohydrate,proximate,g,Carbohydrate,True,False,False
+energy,Energy,proximate,kcal,Energy,True,False,False
+thiamine,Thiamine,water_soluble_vitamin,mg,Thiamine,False,True,False
+riboflavin,Riboflavin,water_soluble_vitamin,mg,Riboflavin,False,True,False
+niacin,Niacin,water_soluble_vitamin,mg,Niacin,False,True,False
+phosphorus,Phosphorus,mineral,mg,Pantothenic Acid,False,False,True
+vitamin_b6,Vitamin B6,water_soluble_vitamin,mg,Vitamin B6,False,True,False
+biotin,Biotin,water_soluble_vitamin,mg,Biotin,False,True,False
+total_folates,Total Folates,water_soluble_vitamin,mg,Total Folates,False,True,False
+vitamin_c,Vitamin C,water_soluble_vitamin,mg,Vitamin C,False,True,False
+vitb6a,VITB6A,water_soluble_vitamin,mg,VITB6A,False,True,False
+calcium,Calcium,mineral,mg,ERGCAL,False,False,True
+toctra,TOCTRA,fat_soluble_vitamin,mg,TOCTRA,False,True,False
+toctrb,TOCTRB,fat_soluble_vitamin,mg,TOCTRB,False,True,False
+toctrg,TOCTRG,fat_soluble_vitamin,mg,TOCTRG,False,True,False
+vitamin_a_retinol,Vitamin A (Retinol),fat_soluble_vitamin,mg,Vitamin A (Retinol),False,True,False
+cholesterol,Cholesterol,fat_soluble_vitamin,mg,Cholesterol,False,True,False
+toctrd,TOCTRD,fat_soluble_vitamin,mg,TOCTRD,False,True,False
+vite,VITE,fat_soluble_vitamin,mg,VITE,False,True,False
+potassium,Potassium,mineral,mg,VITK2,False,False,True
+lutn,LUTN,carotenoid,mg,LUTN,False,True,False
+zea,ZEA,carotenoid,mg,ZEA,False,True,False
+cereals,CEREALS,mineral,mg,CEREALS,False,False,True
+and,AND,mineral,mg,AND,False,False,True
+millets,MILLETS,mineral,mg,MILLETS,False,False,True
+iron,Iron,mineral,mg,Iron,False,False,True
+zinc,Zinc,mineral,mg,Zinc,False,False,True
+sodium,Sodium,mineral,mg,Sodium,False,False,True
+magnesium,Magnesium,mineral,mg,Magnesium,False,False,True
+egg,EGG,mineral,mg,EGG,False,False,True
+starch,STARCH,carbohydrate_detail,g,STARCH,False,False,False
+frus,FRUS,carbohydrate_detail,g,FRUS,False,False,False
+glus,GLUS,carbohydrate_detail,g,GLUS,False,False,False
+sucs,SUCS,carbohydrate_detail,g,SUCS,False,False,False
+mals,MALS,carbohydrate_detail,g,MALS,False,False,False
+f10d0,F10D0,fatty_acid,g,F10D0,False,False,False
+f12d0,F12D0,fatty_acid,g,F12D0,False,False,False
+f14d0,F14D0,fatty_acid,g,F14D0,False,False,False
+f16d0,F16D0,fatty_acid,g,F16D0,False,False,False
+f18d0,F18D0,fatty_acid,g,F18D0,False,False,False
+f20d1n9f,F20D1N9F,fatty_acid,g,F20D1N9F,False,False,False
+f20d0,F20D0,fatty_acid,g,F20D0,False,False,False
+f22d0,F22D0,fatty_acid,g,F22D0,False,False,False
+f24d0,F24D0,fatty_acid,g,F24D0,False,False,False
+f14d1,F14D1,fatty_acid,g,F14D1,False,False,False
+f22d1n9,F22D1N9,fatty_acid,g,F22D1N9,False,False,False
+f24d1c,F24D1C,fatty_acid,g,F24D1C,False,False,False
+f18d2cn6,F18D2CN6,fatty_acid,g,F18D2CN6,False,False,False
+f20d2,F20D2,fatty_acid,g,F20D2,False,False,False
+f18d3n3,F18D3N3,fatty_acid,g,F18D3N3,False,False,False
+f20d4n6,F20D4N6,fatty_acid,g,F20D4N6,False,False,False
+fasat,FASAT,fatty_acid,g,FASAT,False,False,False
+fams,FAMS,fatty_acid,g,FAMS,False,False,False
+f16d1c,F16D1C,fatty_acid,g,F16D1C,False,False,False
+f4d0,F4D0,fatty_acid,g,F4D0,False,False,False
+f15d0,F15D0,fatty_acid,g,F15D0,False,False,False
+f20d3n6,F20D3N6,fatty_acid,g,F20D3N6,False,False,False
+f16d1,F16D1,fatty_acid,g,F16D1,False,False,False
+f18d1,F18D1,fatty_acid,g,F18D1,False,False,False
+f20d1,F20D1,fatty_acid,g,F20D1,False,False,False
+f22d1,F22D1,fatty_acid,g,F22D1,False,False,False
+f20d5n3,F20D5N3,fatty_acid,g,F20D5N3,False,False,False
+f22d6n3,F22D6N3,fatty_acid,g,F22D6N3,False,False,False
+f24d1,F24D1,fatty_acid,g,F24D1,False,False,False
+f18d1cn9,F18D1CN9,fatty_acid,g,F18D1CN9,False,False,False
+f20d1n9,F20D1N9,fatty_acid,g,F20D1N9,False,False,False
+f22d5n3,F22D5N3,fatty_acid,g,F22D5N3,False,False,False
+cholc,CHOLC,fatty_acid,g,CHOLC,False,False,False
+f22d2,F22D2,fatty_acid,g,F22D2,False,False,False
+histidine,Histidine,amino_acid,g,Histidine,False,False,False
+isoleucine,Isoleucine,amino_acid,g,Isoleucine,False,False,False
+leucine,Leucine,amino_acid,g,Leucine,False,False,False
+lysine,lysine,other,g,lysine,False,False,False
+methionine,methionine,other,g,methionine,False,False,False
+cystine,Cystine,amino_acid,g,Cystine,False,False,False
+threonine,Threonine,amino_acid,g,Threonine,False,False,False
+valine,Valine,amino_acid,g,Valine,False,False,False
+alanine,Alanine,amino_acid,g,Alanine,False,False,False
+arginine,Arginine,amino_acid,g,Arginine,False,False,False
+glutamic_acid,Glutamic Acid,amino_acid,g,Glutamic Acid,False,False,False
+glycine,Glycine,amino_acid,g,Glycine,False,False,False
+serine,Serine,amino_acid,g,Serine,False,False,False
+tyrosine,Tyrosine,amino_acid,g,Tyrosine,False,False,False
+asn,ASN,amino_acid,g,ASN,False,False,False
+citac,CITAC,organic_acid,g,CITAC,False,False,False
+fumac,FUMAC,organic_acid,g,FUMAC,False,False,False
+malac,MALAC,organic_acid,g,MALAC,False,False,False
+tarac,TARAC,organic_acid,g,TARAC,False,False,False
+chlrac,CHLRAC,polyphenol,g,CHLRAC,False,False,False
+luteol,LUTEOL,polyphenol,g,LUTEOL,False,False,False
+gnstein,GNSTEIN,polyphenol,g,GNSTEIN,False,False,False
+querce,QUERCE,polyphenol,g,QUERCE,False,False,False
+rafs,RAFS,bioactive,g,RAFS,False,False,False
+stas,STAS,bioactive,g,STAS,False,False,False
+vers,VERS,bioactive,g,VERS,False,False,False
+stgstr,STGSTR,bioactive,g,STGSTR,False,False,False
+f6d0,F6D0,edible_oil_fatty_acid,g,F6D0,False,False,False
+f8d0,F8D0,edible_oil_fatty_acid,g,F8D0,False,False,False

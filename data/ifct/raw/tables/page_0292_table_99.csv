@@ -1,0 +1,47 @@
+Table,,,,,,,,,,,,,,
+7.,,,,,sn,Oleic,Eicosaenoic,Erucic,Nervonic,Linoleic,Eicosadienoic,Docosadienoic,α-Linolenic,Eicosatrienoic
+Fa,ed,,,,oig,(C18:1n9),(C20:1n9),(C22:1n9),(C24:1n9),(C18:2n6),(C20:2),(C22:2),(C18:3n3),(C20:3n6)
+tty,oC,,Fish,Name,eR,,,,,,,,,
+Acid,do,,,,fo,,,,,,,,,
+P,oF,,,,.,,,,,mg,,,,
+rofile,,,,,oN,,,,,,,,,
+,,,,,,F18D1CN9,F20D1N9,F22D1N9,F24D1C,F18D2CN6,F20D2,F22D2,F18D3N3,F20D3N6
+,,,,,,,,,,,,,,
+,R,MRINE M,OLLU,SKS,,,,,,,,,,
+,,,,,,,,,,,,,,
+,R001,"Clam, green",shell (P,erna viridis ),1,18.53,16.55,,,19.74,2.38,,,
+,,,,,,,,,,,,,,
+,R002,"Clam, white","shell, ri",bbed (Meretrix meretrix),1,60.30,14.05,,,16.94,29.48,,,
+,,,,,,,,,,,,,,
+,R003,Octopus (O,ctopus v,ulgaris),1,46.38,,,,9.32,,,,
+,,,,,,,,,,,,,,
+,R004,"Squid, black",(Loligo,sp.),1,36.20,13.63,,,8.46,,,,
+,,,,,,,,,,,,,,
+,R005,"Squid, hard",shell (S,epia pharaonis),1,37.90,10.63,,,3.25,2.32,,,
+,,,,,,,,,,,,,,
+,R006,"Squid, red (",Loligo du,vaucelii),2,61.11,9.77,,,17.81,1.87,,,
+,,,,,,,,,,,,,,
+,R007,"Squid, white",", small (",Uroteuthis duvauceli),1,37.64,18.13,,,8.22,,,,
+254,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,S,FRESH,WTER,FISH ND SHELLFIS,H,,,,,,,,,
+,,,,,,,,,,,,,,
+,S001,Cat fish (Ta,ndanus ta,ndanus),2,1428±1049,88.89±56.90,,,458±327,132±104,36.82±28.10,,51.98±23.47
+,,,,,,,,,,,,,,
+,S002,Catla (Catla,catla),,6,910±35.6,53.36±16.22,,,214±51.9,89.97±95.09,,,26.26±10.65
+,,,,,,,,,,,,,,
+,S003,Freshwater,Eel (Ang,uilla anguilla),1,493,35.62,,,190,90.12,20.95,,24.90
+,,,,,,,,,,,,,,
+,S004,Gold fish (C,arassius,auratus),2,715,102,,,302,26.52,,,24.29
+,,,,,,,,,,,,,,
+,S005,Pangas (Pa,ngasiano,don hypophthalmus),6,510±243,71.60±60.25,,,221±87.0,57.41±48.71,,,16.97±5.91
+,,,,,,,,,,,,,,
+,S006,Rohu (Labe,o rohita),,6,2401±807,93.13±55.77,,,531±149,46.60±48.01,,,44.91±22.09
+,,,,,,,,,,,,,,
+,S007,Crab (Pachy,grapsus,sp.),1,111,,,,16.26,,,,
+,,,,,,,,,,,,,,
+,S008,"Prawns, big",(Macrob,rachium rosenbergii),1,39.93,2.25,,,17.75,3.91,,,
+,,,,,,,,,,,,,,
+,S009,"Prawns, sm",all (Macr,obrachium sp.),3,130,,,,41.37,14.44,,,
+,,,,,,,,,,,,,,
+,S010,Tiger prawn,s (Macro,brachium sp.),2,95.76,7.92,,,29.27,,,,

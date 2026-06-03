@@ -1,0 +1,60 @@
+Analyte,,Method,,Reference,,
+Moisture,,Gravimetric using vacuum /Hot,air oven,AOAC 934.01,,
+Protein,,Titrimetry by combustion/Kjeld,ahl/Mixed,AOAC 2001.11,; Jones (1941),
+,,catalyst,,,,
+Ash,,Gravimetric using Muffle furna,ce,AOAC 942.05,,
+Total fat,,Gravimetry; Ether extraction us,ing Soxhlet,AOAC 963.15,,
+,,apparatus,,,,
+"Total, sol",uble and,Enzymatic-gravimetric,,AOAC 991.43,,
+insoluble,dietary fiber,,,,,
+Available,carbohydrate,Calculation by difference,,Greenfield & S,outhgate (2003),
+,,Trienzyme extraction and,,AOAC 991.43;,AOAC 985.29,
+,,spectrophotometry,,,,
+,,,,Merrill & Watt,(1973); FAO / I,NFOO
+Energy,,Atwater conversion factors,,Guidelines (20,12),
+Thiamin,,Fluorometry,,AOAC 942.23;,Ramasastri (197,5)
+Riboflavi,n,Turbidometric-Microbiological,assay,AOAC 940.33;,AOAC 960.46,
+Niacin,,Turbidometric-Microbiological,assay,AOAC 985.34;,960.46,
+Pantothe,nic acid,RP-HPLC with UV detector,,David & Harve,y (2000),
+Vitamin,B6,HPLC-fluorometric detection,,AOAC 985.32;,Ollilainen (2008,)
+Biotin,,U-HPLC and LC-ESI-IT-MS m,ethod,Holler et al. (20,06),
+Vitamin,B9,Trienzyme Extraction and U-H,PLC - UV or,Finglas et al. (1,999); Vahteristo,et al.
+,,fluorescence detection,,AOAC 2011.06,; AOAC 2013.1,3
+Vitamin,C,RP-HPLC,,AOAC 985.33;,Keating & Had,dad (19
+Vitamin,E,HPLC,,AOAC 992.03;,AOAC 2012.10,
+Vitamin,A,HPLC,,AOAC 974.29;,Bieri et al. (197,9)
+Caroteno,ids,HPLC,,Delia & Mieko,(2004),
+Vitamin,D2 & D3,RP- HPLC-APCI-MS.,,AOAC 982.29,,
+Vitamin,K1 & K2,RP- HPLC-APCI-MS,,AOAC 992.27,,
+Free suga,rs,HPLC-RID,,AOAC 2013.12,,
+,,Calculated from the increase in,the amount,,,
+Starch,,of glucose by using conversion,factor,Casterline et al.,(1998),
+Oligosac,charides,,,,,
+(Raffino,"se, Stachyose,",HPLC,,Frias et al. (199,4); Johansen et,al. (199
+Verbasco,se and,,,Sanchez-Mata e,t al. (1998),
+Ajucose),,,,,,
+"Iron, Zin","c, Copper,",,,,,
+Mangane,"se, Potassium,",Atomic Absorption Spectropho,tometry,,,
+Magnesi,"um, Sodium,",(AAS),,,,
+"Calcium,",Aluminium,,,,,
+"Lead, Ca","dmium,",,,,,
+"Nickel, C","obalt,",Graphite furnace Atomic Absor,ption,AOAC 968.08;,AOAC 999.10;,AOAC
+Chromiu,"m, Lithium,",Spectrophotometry,,,,
+Molybde,num,,,,,
+"Arsenic,","Antimony,",Atomic Absorption Spectropho,tometry,,,
+"Mercury,",and Selenium,(Hydride generation),,,,
+,,,,AOAC 935.45;,AOAC 995.11;,Fiske &
+Phosphor,us,Colorimetry,,Subbarow (192,5),
+Heavy an,d trace metals,,,,,
+"Lead, M","ercury,",,,,,
+Antimon,"y, Cadmium,",,,,,
+Molybde,"num,",Inductively Coupled Plasma Ma,ss,,,
+Selenium,", Arsenic,",Spectrometry (ICP-MS),,AOAC 2013.06,,
+"Cobalt, N","ickel,",,,,,
+Chromiu,"m, Aluminum,",,,,,
+Lithium,,,,,,
+Citric aci,"d, Malic acid,",,,,,
+Fumaric,"acid, Succinic",,,,,
+"acid, Lac","tic acid, Cis-",HPLC,,AOAC 969.30;,AOAC 950.35;,AOAC
+Aconitic,"acid, Tartaric",,,,,
+acid and,Quninic acid,,,,,

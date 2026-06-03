@@ -1,0 +1,25 @@
+edoC dooF,,Fish Name,snoigeR fo .oN,Thiamine (B1),Riboflavin (B2),Niacin Pant (B3),othenic Acid (B5),Total B6 Tota,l Folates
+,,,,,,mg,,,µg
+,,,,,,,,,
+,,,,THIA,RIBF,NIA,PANTAC,VITB6A,FOLSUM
+P088,Vela meen (A,prion virescens),1,0.05,0.04,5.15,0.22,97.92,1632
+P089,Vora (Siganu,s javus),2,0.06,0.07,3.72,0.28,121,1480
+P090,Whale shark,(Galeocerdo cuvier),1,0.06,0.04,2.90,0.84,125,1605
+P091,Xiphinis (Xip,hias gladius),1,0.06,0.05,3.24,0.21,65.79,820
+P092,"Z.Eggs, Cat fi",sh (Ompok bimaculatus),1,,0.19,1.09,0.83,148,2059
+,,,,,,,,,
+Q,MARINE,SHELLFISH,,,,,,,
+Q001,Crab (Menipp,e mercenaria),1,0.01,0.10,1.66,0.71,120,2304
+Q002,"Crab, sea (P",ortunus sanguinolentus),1,0.05,0.06,0.97,1.53,117,774
+Q003,"Lobster, bro",wn (Thenus orientalis),1,0.01,0.01,0.63,1.44,216,1129
+Q004,"Lobster, king",size (Thenus orientalis),1,0.01,0.02,1.87,1.25,156,1997
+Q005,Mud crab (Sc,ylla tranquebarica),1,0.06,0.14,0.60,1.30,180,1383
+Q006,Oyster (Cras,sostrea sp.),1,0.06,0.07,0.71,1.18,145,1612
+Q007,Tiger prawns,", brown(Solenocera crassicornis)",1,0.01,0.03,1.03,1.68,104,1537
+Q008,Tiger Prawns,", orange (Penaeus monodon)",1,0.03,0.03,1.18,1.47,112,807
+,,,,,,,,,
+R,MARINE,MOLLUSKS,,,,,,,
+R001,"Clam, green",shell(Perna viridis),1,0.06,0.10,0.96,1.14,96.00,907
+R002,"Clam, white","shell, ribbed (Meretrix meretrix)",1,0.06,0.11,0.90,0.97,108,900
+R003,Octopus (Oc,topus vulgaris),1,0.05,0.05,1.18,0.94,87.71,2087
+R004,"Squid, black",(Loligo sp.),1,0.02,0.04,1.04,0.72,236,1233

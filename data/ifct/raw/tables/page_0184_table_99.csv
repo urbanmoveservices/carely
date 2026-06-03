@@ -1,0 +1,8 @@
+edoc dooF,Food Name,snoigeR fo .oN,Magnesium (Mg),Manganese (Mn),Mercury (Hg),Molebdeum (Mo),Nickel (Ni),Phosphorus (P),Potassium (K),Selenium (Se),Sodium (Na),Zinc (Zn)
+,,,mg,mg,µg,mg,mg,mg,mg,µg,mg,mg
+,,,MG,MN,HG,MO,NI,P,K,SE,NA,ZN
+L,MILK AND MILK PRODUCTS,,,,,,,,,,,
+L001,"Milk, whole, Buffalo",6,10.05±1.46,0.01±0.00,,,,86.94±6.27,109±5.6,1.45±0.26,30.10±2.98,0.30±0.05
+L002,"Milk, whole, Cow",6,8.28±1.38,0.01±0.00,,,,96.56±9.10,115±4.1,0.95±0.17,25.46±2.86,0.33±0.03
+L003,Panner,6,26.62±1.87,0.13±0.05,,,0.010±0.006,330±34.6,63.53±9.96,23.14±1.37,18.04±1.25,2.74±0.14
+L004,Khoa,6,58.53±6.04,0.08±0.03,,,0.008±0.001,476±47.4,536±24.3,44.97±13.14,48.10±10.89,2.34±0.15

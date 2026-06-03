@@ -1,0 +1,27 @@
+{
+  "validated_at": "2026-05-31T16:52:58.355492+00:00",
+  "source_attribution": "Source: Indian Food Composition Tables 2017, National Institute of Nutrition / ICMR.",
+  "raw_record_count": 3600,
+  "counts": {
+    "foods": 508,
+    "nutrients": 105,
+    "food_nutrient_rows": 25179,
+    "non_null_values": 25179,
+    "duplicate_rows": 0
+  },
+  "expected": {
+    "foods": 528,
+    "nutrients": 151
+  },
+  "warnings": [],
+  "issues_count": 0,
+  "issues": [],
+  "duplicate_food_names": [
+    "Gold fish (Carassius auratus)",
+    "Prawns, big (Macrobrachium rosenbergii)"
+  ],
+  "duplicate_food_codes": [],
+  "missing_nutrient_values": [],
+  "suspicious_top_20": [],
+  "ok": true
+}

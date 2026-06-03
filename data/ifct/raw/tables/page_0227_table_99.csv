@@ -1,0 +1,21 @@
+edoc dooF,Food Nam,e,snoigeR fo .oN,Capric (C10:0),Lauric (C12:0),Myristic (C14:0),Palmitic (C16:0),Stearic (C18:0),Arachidic (C20:0),Behenic (C22:0),Lignoceric M (C24:0),yristoleic (C14:1),Palmitoleic (C16:1),Oleic (C18:1n9)
+,,,,,,,,,mg,,,,,
+,,,,,,,,,,,,,,
+,,,,F10D0,F12D0,F14D0,F16D0,F18D0,F20D0,F22D0,F24D0,F14D1,F16D1C,F18D1CN9
+A,CEREALS AND,MILLETS,,,,,,,,,,,,
+A001,"Amaranth seed, black (A cruentus)",maranthus,1,,,15.64,1043,155,38.00,16.07,12.14,,,1020
+A002,"Amaranth seed, pale bro (Amaranthus cruentus)",wn,6,,,10.68±1.35,891±54.5,172±14.1,36.02±2.68,15.61±1.31,13.51±2.06,,,1030±64.3
+A003,Bajra (Pennisetum typhoi,deum),6,,,,729±21.3,128±19.6,18.21±2.78,,,,6.97±0.45,1040±39.8
+A004,Barley (Hordeum vulgare),,6,,,,209±9.4,23.35±2.74,,,,,,90.79±5.63
+A005,Jowar (Sorghum vulgare),,6,,,,149±5.6,14.22±0.79,,,,,,314±13.7
+A006,"Maize, dry (Zea mays)",,6,,,,363±4.6,42.45±2.76,7.14±0.95,,,,,700±17.9
+A007,"Maize, tender, local (Zea",mays),6,,,,96.13±3.97,10.88±1.55,2.37±0.63,,,,,145±6.5
+A008,"Maize, tender, sweet (Ze",a mays),4,,,,106±2.4,14.36±0.59,2.95±0.08,,,,,174±6.1
+A009,Quinoa(Chenopodium qui,noa),1,,,82.76,434,52.88,,,,44.41,56.79,1323
+A010,Ragi (Eleusine coracana),,5,,,,290±15.4,27.86±2.43,,,,,,585±36.3
+A011,Rice flakes (Oryza sativa,),6,,,,261±20.2,23.68±1.50,,,,,,425±11.4
+A012,Rice puffed (Oryza sativa,),6,,,,43.29±5.23,3.55±0.45,,,,,,39.77±5.05
+A013,"Rice, raw, brown (Oryza",sativa ),6,1.39±0.31,,30.42±3.15,273±14.9,33.01±4.34,3.09±0.21,1.98±0.21,2.49±0.38,,2.77±0.46,197±15.4
+A014,"Rice, parboiled, milled (",Oryza sativa ),6,0.63±0.21,,13.22±1.52,120±8.0,13.83±1.67,1.31±0.18,0.91±0.18,0.93±0.24,,1.19±0.21,84.09±6.47
+A015,"Rice, raw, milled (Oryza",sativa ),6,0.85±0.30,,13.19±3.00,143±28.0,14.50±3.27,1.46±0.40,1.98±1.49,1.14±0.35,,1.49±0.47,109±21.2
+A016,Samai (Panicum miliare),,6,,,,487±26.1,102±11.9,,,,,,868±24.2

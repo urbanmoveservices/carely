@@ -1,0 +1,131 @@
+
+============================================================
+PAGE 1 (len=0, tables=0)
+============================================================
+
+
+
+============================================================
+PAGE 2 (len=286, tables=0)
+============================================================
+
+Indian Food Composition Tables
+T. Longvah
+R. Ananthan
+K. Bhaskarachary
+K. Venkaiah
+NATIONAL INSTITUTE OF NUTRITION
+(Indian Council of Medical Research)
+Department of Health Research
+Ministry of Health & Family Welfare, Government of India
+Hyderabad- 500 007, Telangana State, INDIA
+2017
+
+============================================================
+PAGE 3 (len=1525, tables=0)
+============================================================
+
+Indian Food Composition Tables 2017
+T. Longvah, R. Ananthan, K. Bhaskarachary and K. Venkaiah
+Copyright © 2017 by National Institute of Nutrition
+Indian Council of Medical Research
+Department of Health Research
+Ministry of Health and Family Welfare, Government of India
+Jamai Osmania (PO), Hyderabad – 500 007
+Telangana, India
+Phone: +91 40 27197334, Fax: +91 40 27000339, Email: nin@ap.nic.in
+The use and dissemination of the data in this book is encouraged. This publication can be reproduced
+for p
+
+============================================================
+PAGE 41 (len=2643, tables=0)
+============================================================
+
+Table 1. PROXIMATE PRINCIPLES AND DIETARY FIBRE
+(All values are expressed per 100g edible portion; All blank space in the table represent below detectable limit)
+Total Insoluble Soluble
+KJ
+Food Name WATER PROTCNT ASH FATCE FIBTG FIBINS FIBSOL CHOAVLDF ENERC
+A CEREALS AND MILLETS
+A001 Amaranth seed, black (Amaranthus cruentus) 1 9.89 14.59 2.78 5.74 7.02 5.76 1.26 59.98 1490
+Amaranth seed, pale brown (Amaranthus
+A002 6 9.20±0.40 13.27±0.34 3.05±0.30 5.56±0.33 7.47±0.09 5.80±0.17 1.67±0.21 61.46±0
+
+============================================================
+PAGE 43 (len=2497, tables=0)
+============================================================
+
+Total Insoluble Soluble
+KJ
+Food Name WATER PROTCNT ASH FATCE FIBTG FIBINS FIBSOL CHOAVLDF ENERC
+edoc
+dooF
+snoigeR
+fo
+.oN
+Dietary Fibre
+Moisture Protein Ash Total Fat Carbohydrate Energy
+g
+B014 Lentil whole, brown (Lens culinaris) 6 9.20±0.77 22.49±0.58 2.39±0.35 0.64±0.02 16.82±1.30 14.16±1.33 2.66±0.42 48.47±1.12 1251±23
+B015 Lentil whole, yellowish (Lens culinaris) 2 9.75 22.87 2.20 0.61 16.66 14.15 2.51 47.91 1246
+B016 Moth bean (Vigna aconitifolia) 6 8.14±0.49 19.75±0.38 3.14±0.18 1.76±0.09 
+
+============================================================
+PAGE 80 (len=2677, tables=0)
+============================================================
+
+Thiamine Riboflavin Niacin Pantothenic Biotin T o t al Folates T otal Ascorbic
+Total B6 (B1) (B2) (B3) Acid (B5) (B7) (B9) Acid
+mg
+THIA RIBF NIA PANTAC VITB6C BIOT FOLSUM VITC
+edoc
+dooF
+Food Name
+snoigeR
+fo
+.oN
+E017 Dates, dry, pale brown (Phoenix dactylifera) 6 0.03±0.012 0.03±0.008 1.47±0.07 0.51±0.07 0.14±0.009 0.82±0.11 18.65±1.39 4.42±0.54
+E018 Dates, dry, dark brown (Phoenix dactylifera) 2 0.02 0.03 1.09 0.53 0.153 0.94 12.80 3.84
+E019 Dates, processed (Phoenix dactylifera) 2 0.05 0.02 0.5
+
+============================================================
+PAGE 200 (len=2095, tables=11)
+============================================================
+
+Table
+5.
+Minerals
+and
+Trace
+Elements
+edoC
+dooF
+Fish Name
+snoigeR
+fo
+.oN
+Magnesium Manganese Mercury Molebdenum Nickel Phosphorus Potassium Selenium Sodium Zinc
+(Mg) (Mn) (Hg) (Mo) (Ni) (P) (K) (Se) (Na) (Zn)
+mg mgg mg mg mg mgg mg mg
+MG MN HG MO NI P K SE NA ZN
+P042 Nalla bontha (Epinephelus sp.) 1 29.20 0.01 0.003 197 403 12.34 57.87 0.30
+P043 Narba (Caranx sexfasciatus) 2 26.33 0.01 0.003 235 384 42.50 49.51 0.45
+P044 Paarai (Caranx heberi) 1 27.59 0.01 0.003 0.007 284 384 35.63 45.22 0.45
+P04
+
+============================================================
+PAGE 300 (len=2568, tables=0)
+============================================================
+
+Histidine Lysine Methionine Cystine Phenylalanine Threonine Tryptophan Valine
+g
+HIS ILE LEU LYS MET CYS PHE THR TRP VAL
+edoc
+dooF
+Food Name
+snoigeR
+fo
+.oN
+B016 Moth bean (Vigna aconitifolia) 6 2.80±0.29 4.17±0.57 7.85±0.73 6.63±0.60 0.97±0.20 0.43±0.06 5.85±0.70 3.63±0.11 0.92±0.04 4.90±0.47
+B017 Peas, dry (Pisum sativum) 6 2.34±0.09 3.87±0.46 7.02±0.38 7.12±0.51 0.68±0.19 0.82±0.15 4.76±0.23 3.65±0.15 0.86±0.19 4.67±0.66
+B018 Rajmah, black (Phaseolus vulgaris) 2 2.44 3.91 6.84 6.01 0.79 0.72 5.

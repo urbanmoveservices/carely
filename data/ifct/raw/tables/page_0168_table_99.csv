@@ -1,0 +1,23 @@
+edoc dooF,,Food Name,,snoigeR fo .oN,Magnesium (Mg),Manganese (Mn),Mercury (Hg),Molebdeum (Mo),Nickel (Ni),Phosphorus (P),Potassium (K),Selenium (Se),Sodium (Na),Zinc (Zn)
+,,,,,mg,mg,µg,mg,mg,mg,mg,µg,mg,mg
+,,,,,MG,MN,HG,MO,NI,P,K,SE,NA,ZN
+D077,"Zucchini, gre",en (Cucurbita,pepo),2,15.41,0.13,,,,21.38,178,0.21,0.40,0.29
+D078,"Zucchini, yell",ow(Cucurbita,pepo),2,10.82,0.21,,,,32.03,131,0.30,0.39,0.27
+,,,,,,,,,,,,,,
+E,FRUITS,,,,,,,,,,,,,
+E001,"Apple, big (M",alus domestica,),6,8.09±0.81,0.05±0.02,0.01±0.00,0.839±0.447,3.798±1.461,10.44±1.18,116±12.9,0.47±0.18,1.43±0.42,0.09±0.04
+E002,"Apple, green",(Malus domes,tica),6,5.42±0.11,0.02±0.00,,,,7.48±0.11,94.55±2.07,0.25±0.08,1.47±0.65,0.08±0.01
+E003,"Apple, small",(Malus domest,ica),6,5.48±0.56,0.04±0.01,,0.003±0.002,0.002±0.001,8.39±1.20,100±9.1,0.23±0.07,1.45±0.05,0.05±0.02
+E004,"Apple, small, domestica)",Kashmir (Ma,lus,1,5.19,0.05,,0.002,0.002,10.72,106,0.11,1.22,0.08
+E005,"Apricot, dried",(Prunus arme,niaca),6,14.04±2.21,0.31±0.02,,0.018±0.011,0.055±0.016,72.02±6.39,285±5.9,2.05±0.52,3.94±0.12,0.41±0.04
+E006,"Apricot, proc",essed (Prunu,s armeniaca),3,4.29±0.21,0.06±0.02,,0.008±0.000,0.058±0.018,27.33±1.29,95±2.3,1.03±0.39,1.60±0.02,0.26±0.03
+E007,Avocado fruit,(Persea ame,ricana),1,48.14,0.74,,,,63.14,377,,2.81,0.75
+E008,Bael fruit (Ae,gle marmelos),,1,34.10,0.10,0.07,0.819,0.042,37.29,409,0.72,1.56,0.14
+E009,"Banana, ripe, paradisiaca)",montham (M,usa x,1,30.22,0.36,,,0.013,20.85,362,,1.25,0.15
+E010,"Banana, ripe, paradisiaca)",poovam (Mu,sa x,2,43.79,0.30,,0.002,0.010,33.63,335,,1.00,0.17
+E011,"Banana, ripe,",red (Musa x p,aradisiaca),1,31.44,0.19,,,0.006,23.27,313,,1.11,0.09
+E012,"Banana, ripe, paradisiaca)",robusta (Mus,a x,6,34.98±7.77,0.36±0.15,,0.001±0.001,0.008±0.005,24.32±4.46,306±32.7,,0.85±0.14,0.14±0.05
+E013,Black berry (,Rubus fruticos,us),5,30.90±4.17,0.47±0.01,,,0.027±0.004,20.08±4.50,205±40.5,,1.21±0.33,0.11±0.03
+E014,"Cherries, red",(Prunus ceras,us),4,14.37±4.80,0.15±0.08,,,0.002±0.001,25.31±8.43,165±44.4,,1.64±0.09,0.12±0.04
+E015,"Currants, bla",ck (Ribes nigr,um),1,16.66,0.11,,,0.005,78.80,283,1.51,1.45,0.21
+E016,Custard appl,e (Annona squ,amosa),1,38.47,0.15,,,,40.81,278,,3.11,0.22

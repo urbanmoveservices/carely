@@ -1,0 +1,20 @@
+[
+  { "alias": "chawal", "food_match": "rice", "language": "hi" },
+  { "alias": "chaval", "food_match": "rice", "language": "hi" },
+  { "alias": "atta", "food_match": "wheat flour", "language": "hi" },
+  { "alias": "gehun ka atta", "food_match": "wheat flour", "language": "hi" },
+  { "alias": "dal", "food_match": "pulse", "language": "hi" },
+  { "alias": "moong", "food_match": "green gram", "language": "hi" },
+  { "alias": "moong dal", "food_match": "green gram", "language": "hi" },
+  { "alias": "palak", "food_match": "spinach", "language": "hi" },
+  { "alias": "doodh", "food_match": "milk", "language": "hi" },
+  { "alias": "dudh", "food_match": "milk", "language": "hi" },
+  { "alias": "roti", "food_match": "wheat", "language": "hi" },
+  { "alias": "sabzi", "food_match": "vegetable", "language": "hi" },
+  { "alias": "paneer", "food_match": "cottage cheese", "language": "hi" },
+  { "alias": "ghee", "food_match": "butter", "language": "hi" },
+  { "alias": "chana", "food_match": "bengal gram", "language": "hi" },
+  { "alias": "rajma", "food_match": "kidney bean", "language": "hi" },
+  { "alias": "arhar", "food_match": "pigeon pea", "language": "hi" },
+  { "alias": "toor dal", "food_match": "pigeon pea", "language": "hi" }
+]

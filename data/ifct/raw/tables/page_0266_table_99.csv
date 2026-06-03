@@ -1,0 +1,46 @@
+Tab,,,,,,,,,T,otal Mono,Total Poly,
+le,,,,s,Eicosatrienoic,Arachidonic,Eicosa-,Docosa- To,tal Saturated Uns,aturated Fatty,Unsaturated,
+7. Fat,edoC,,,noige,(C20:3n6),(C20:4n6),pentaenoic (C20:5n3),hexaenoic F (C22:6n3),atty Acids (TSFA),Acids,Fatty Acids,Cholestero
+ty Acid,doo,,Food Name,R fo .,,,,mg,,(TMUFA),(TPUFA),
+Pr,F,,,oN,,,,,,,,
+ofile,,,,,F20D3N6,F20D4N6,F20D5N3,F22D6N3,FASAT,FAMS,FAPU,CHOLC
+,,,,,,,,,,,,
+,N004,"Chicken, po","ultry, wing, skinless",5,7.31±0.38,,,,1241±55.1,1777±73.9,658±22.3,54.52±0.78
+,,,,,,,,,,,,
+,N005,"Poultry, chi","cken, liver",1,,,,194,1328,681,1013,268
+,,,,,,,,,,,,
+,N006,"Poultry, chi","cken, gizzard",1,,122,,,772,716,464,57.24
+,,,,,,,,,,,,
+,N007,Country hen,", leg, with skin",1,6.24,90,,15.98,534,681,400,87.95
+,,,,,,,,,,,,
+,N008,Country hen,", thigh, with skin",1,3.63,48,,7.63,610,750,360,91.81
+,,,,,,,,,,,,
+,N009,Country hen,", breast, with skin",1,,72,,,419,453,262,66.03
+,,,,,,,,,,,,
+,N010,Country hen,", wing, with skin",1,6.75,87,12.90,25.09,688,836,451,55.42
+,,,,,,,,,,,,
+,N011,"Duck, meat,",with skin,1,,,,,345,2215,304,81.76
+,,,,,,,,,,,,
+228,N012,"Emu, meat,",skinless,1,,34,5.94,5.26,200,242,144,72.69
+,,,,,,,,,,,,
+,N013,Guinea fowl,", meat, with skin",1,,1,45.45,102,1138,928,995,87.48
+,,,,,,,,,,,,
+,N014,"Pigeon, mea","t, with skin",1,,200,94.93,29.29,1828,2588,1282,107
+,,,,,,,,,,,,
+,N015,"Quail, meat,",skinless,1,,,,,2024,2789,810,77.87
+,,,,,,,,,,,,
+,N016,"Turkey, leg,",with skin,1,,,,,980,938,1058,83.44
+,,,,,,,,,,,,
+,N017,"Turkey, thig","h, with skin",1,,,,,1015,927,1035,85.35
+,,,,,,,,,,,,
+,N018,"Turkey, brea","st, with skin",1,,,,,934,884,1055,81.28
+,,,,,,,,,,,,
+,N019,"Turkey, win","g, with skin",1,,,,,897,826,913,80.01
+,,,,,,,,,,,,
+,O,ANIMAL,MEAT,,,,,,,,,
+,,,,,,,,,,,,
+,O001,"Goat, shoul",der,6,,178±54.8,,,5444±803,4902±415,643±214,82.18±3.33
+,,,,,,,,,,,,
+,O002,"Goat, chops",,6,,59.35±12.87,,,2877±386,2346±210,259±63.7,88.37±7.14
+,,,,,,,,,,,,
+,O003,"Goat, legs",,6,,172±52.3,,,3665±471,3038±393,567±130,82.52±5.47

@@ -1,0 +1,9 @@
+{
+  "phase": "validated",
+  "validation_ok": true,
+  "foods": 508,
+  "nutrients": 105,
+  "food_nutrient_rows": 25179,
+  "non_null_values": 25179,
+  "duplicate_rows": 0
+}

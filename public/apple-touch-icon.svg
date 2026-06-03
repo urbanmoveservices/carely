@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+<rect width="180" height="180" rx="39.6" fill="#0f766e"/>
+<circle cx="90" cy="90" r="75.6" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.6999999999999997"/>
+<rect x="86.4" y="54" width="7.199999999999999" height="21.599999999999998" rx="1.7279999999999998" fill="white"/>
+<rect x="79.2" y="61.199999999999996" width="21.599999999999998" height="7.199999999999999" rx="1.7279999999999998" fill="white"/>
+<text x="90" y="118.8" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="700" font-size="50.400000000000006" fill="white">CM</text>
+</svg>

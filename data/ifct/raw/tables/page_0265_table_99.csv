@@ -1,0 +1,22 @@
+,,,,,,,,mg,,,,
+,,,,,,,,,,,,
+,,,,F14D1,F16D1,F18D1,F20D1,F22D1,F24D1,F18D2CN6,F20D2,F18D3N3
+N004,"Chicken, po","ultry, wing, skinless",5,,238±14.9,1524±63,15.00±1.25,,,623±20.6,,27.64±5.06
+N005,"Poultry, chi","cken, liver",1,,,681,,,,680,,140
+N006,"Poultry, chi","cken, gizzard",1,,98,604,13.85,,,342,,
+N007,Country hen,", leg, with skin",1,,59,616,5.59,,,273,3.45,11.45
+N008,Country hen,", thigh, with skin",1,,57,687,6.05,,,287,,12.91
+N009,Country hen,", breast, with skin",1,,28,422,3.65,,,182,,7.26
+N010,Country hen,", wing, with skin",1,,65,763,7.94,,,305,,14.03
+N011,"Duck, meat,",with skin,1,,1467,748,,,,217,,86.54
+N012,"Emu, meat,",skinless,1,,20,221,1.00,,,90,,7.97
+N013,Guinea fowl,", meat, with skin",1,1.52,21,879,17.33,1.86,6.23,816,,30.49
+N014,"Pigeon, mea","t, with skin",1,,283,2305,,,,958,,
+N015,"Quail, meat,",skinless,1,,392,2364,14.13,,12.52,788,,22.50
+N016,"Turkey, leg,",with skin,1,,0,938,,,,908,,150
+N017,"Turkey, thig","h, with skin",1,,0,927,,,,904,,131
+N018,"Turkey, brea","st, with skin",1,,0,884,,,,886,,170
+N019,"Turkey, win","g, with skin",1,,0,826,,,,787,,126
+O,ANIMAL,MEAT,,,,,,,,,,
+O001,"Goat, shoul",der,6,,251±54.2,4563±318,87.48±42.27,,,432±149,,33.28±10.52
+O002,"Goat, chops",,6,,113±27.3,2193±170,39.47±12.04,,,184±42.1,,16.12±8.80

@@ -1,0 +1,1324 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                    String              @id @default(cuid())
+  name                  String
+  email                 String              @unique
+  passwordHash          String
+  role                  String              @default("user")
+  isActive              Boolean             @default(true)
+  lastLoginAt           DateTime?
+  onboardingCompleted   Boolean             @default(false)
+  termsAcceptedAt       DateTime?
+  privacyAcceptedAt     DateTime?
+  medicalConsentAcceptedAt DateTime?
+  emailVerified         Boolean             @default(false)
+  emailVerifiedAt       DateTime?
+  currentPlan           String              @default("free")
+  subscriptionStatus    String              @default("active")
+  subscriptionStartedAt DateTime?
+  subscriptionEndsAt    DateTime?
+  billingProvider       String?
+  billingCustomerId     String?
+  phoneNumber           String?
+  gender                String?
+  dateOfBirth           DateTime?
+  bloodGroup            String?
+  heightCm              Float?
+  weightKg              Float?
+  maritalStatus         String?
+  occupation            String?
+  addressLine1          String?
+  addressLine2          String?
+  city                  String?
+  state                 String?
+  pincode               String?
+  country               String?             @default("India")
+  emergencyContactName  String?
+  emergencyContactRelation String?
+  emergencyContactPhone String?
+  preferredLanguage     String?             @default("en")
+  knownConditionsSummary String?
+  allergiesSummary      String?
+  currentMedicationsSummary String?
+  profileCompleted      Boolean             @default(false)
+  billingProfileCompleted Boolean           @default(false)
+  medicalProfileCompleted Boolean           @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  paymentOrders         PaymentOrder[]
+  paymentTransactions   PaymentTransaction[]
+  documents             Document[]
+  documentPages         DocumentPage[]
+  reports               Report[]
+  familyMembers         FamilyMember[]
+  reminders             Reminder[]
+  insights              HealthInsight[]
+  preference            UserPreference?
+  doctorShareLinks      DoctorShareLink[]
+  doctorQuestionSets    DoctorQuestionSet[]
+  medicationDoseLogs    MedicationDoseLog[]
+  symptomEntries        SymptomJournalEntry[]
+  caregiverInvites      CaregiverInvite[]   @relation("CaregiverInviteOwner")
+  caregiverAccessOwned  CaregiverAccess[]   @relation("CaregiverAccessOwner")
+  caregiverAccessAs     CaregiverAccess[]   @relation("CaregiverAccessCaregiver")
+  emergencyCards        EmergencyHealthCard[]
+  usageCounters         UsageCounter[]
+  authTokens            AuthToken[]
+  demoSeedLog           DemoSeedLog?
+  healthRisks           HealthRisk[]
+  timelineEvents        FamilyTimelineEvent[]
+  labTrendRecords       LabTrendRecord[]
+  reminderSuggestions   ReminderSuggestion[]
+  appNotifications      AppNotification[]
+  manualLabValues       ManualLabValue[]
+  chatThreads           ChatThread[]
+  backgroundJobs        BackgroundJob[]
+  dataExportRequests    DataExportRequest[]
+  accountDeletionRequests AccountDeletionRequest[]
+  emailLogs             EmailLog[]
+  pushSubscriptions     PushSubscription[]
+  supportTickets        SupportTicket[]
+  accessLogs            AccessLog[]
+  errorLogs             ErrorLog[]
+}
+
+model UsageCounter {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  monthKey        String
+  uploadsUsed       Int      @default(0)
+  aiSummariesUsed   Int      @default(0)
+  chatMessagesUsed  Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, monthKey])
+  @@index([userId])
+  @@index([monthKey])
+}
+
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model DemoSeedLog {
+  id       String   @id @default(cuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seededAt DateTime @default(now())
+}
+
+model FamilyMember {
+  id                String             @id @default(cuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName          String
+  relation          String
+  dateOfBirth       DateTime?
+  gender            String?
+  bloodGroup        String?
+  phone             String?
+  email             String?
+  profilePhotoUrl   String?
+  notes             String?
+  heightCm          Float?
+  weightKg          Float?
+  lastReportAt      DateTime?
+  lastAiSummaryAt   DateTime?
+  lastRiskLevel     String?
+  healthScoreLatest Int?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  documents         Document[]
+  healthRisks       HealthRisk[]
+  timelineEvents    FamilyTimelineEvent[]
+  labTrendRecords   LabTrendRecord[]
+  reminderSuggestions ReminderSuggestion[]
+  conditions        HealthCondition[]
+  allergies         Allergy[]
+  medications       Medication[]
+  vitals            VitalRecord[]
+  appointments      Appointment[]
+  emergencyContacts EmergencyContact[]
+  reminders         Reminder[]
+  insights          HealthInsight[]
+  symptomEntries    SymptomJournalEntry[]
+  emergencyCard     EmergencyHealthCard?
+  medicationDoseLogs MedicationDoseLog[]
+  reportContexts    ReportContext[]
+  manualLabValues   ManualLabValue[]
+  chatThreads       ChatThread[]
+
+  @@index([userId])
+  @@index([relation])
+}
+
+model HealthInsight {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  type           String
+  title          String
+  message        String
+  severity       String        @default("info")
+  metadata       Json?
+  isRead         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([type])
+  @@index([severity])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Reminder {
+  id                   String        @id @default(cuid())
+  userId               String
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId       String?
+  familyMember         FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  type                 String
+  title                String
+  description          String?
+  scheduledAt          DateTime
+  repeatType           String        @default("none")
+  status               String        @default("pending")
+  relatedMedicationId  String?
+  relatedAppointmentId String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([type])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  actorRole  String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+}
+
+model Document {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId   String?
+  familyMember     FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  originalFilename String
+  fileType         String
+  fileSize         Int
+  storagePath      String?
+  isEncrypted      Boolean       @default(false)
+  encryptionIv     String?
+  encryptionTag    String?
+  storageVersion   String?
+  uploadMode       String        @default("single") // single, multi_image
+  pageCount        Int           @default(1)
+  combinedTextLength Int?
+  uploadStatus     String        @default("uploaded")
+  extractedText    String?
+  errorMessage     String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  report           Report?
+  reportContext    ReportContext?
+  pages            DocumentPage[]
+  healthRisks      HealthRisk[]
+  timelineEvents   FamilyTimelineEvent[]
+  labTrendRecords  LabTrendRecord[]
+  reminderSuggestions ReminderSuggestion[]
+  manualLabValues  ManualLabValue[]
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([uploadMode])
+}
+
+model DocumentPage {
+  id               String   @id @default(cuid())
+  documentId       String
+  document         Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pageNumber       Int
+  originalFilename String
+  mimeType         String
+  fileSize         Int
+  storagePath      String
+  isEncrypted      Boolean  @default(false)
+  encryptionIv     String?
+  encryptionTag    String?
+  extractedText    String?
+  ocrStatus        String   @default("pending") // pending, processing, completed, failed
+  errorMessage     String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([documentId, pageNumber])
+  @@index([documentId])
+  @@index([userId])
+  @@index([pageNumber])
+  @@index([ocrStatus])
+}
+
+model ReportContext {
+  id                     String        @id @default(cuid())
+  userId                 String
+  documentId             String        @unique
+  document               Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  familyMemberId         String?
+  familyMember           FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+
+  smokingStatus          String?
+  tobaccoUse             String?
+  alcoholUse             String?
+  physicalActivity       String?
+  sugarIntake            String?
+  foodPreference         String?
+  dietNotes              String?
+
+  knownConditions        Json?
+  allergies              Json?
+  currentMedicines       Json?
+  familyHistory          Json?
+  symptoms               Json?
+
+  sleepQuality           String?
+  stressLevel            String?
+  waterIntake            String?
+  heightCm               Float?
+  weightKg               Float?
+
+  fastingStatus          String?
+  recentFeverOrInfection Boolean?
+  supplements            Json?
+  pregnancyStatus        String?
+  doctorDiagnosis        String?
+
+  notes                  String?
+
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([documentId])
+  @@index([familyMemberId])
+}
+
+model Report {
+  id                      String              @id @default(cuid())
+  userId                  String
+  user                    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId              String              @unique
+  document                Document            @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  summary                 String
+  keyFindings             Json
+  abnormalValues          Json
+  foodRecommendations     Json
+  exerciseRecommendations Json
+  lifestyleAdvice         Json
+  riskFlags               Json
+  chartData               Json
+  contextualInsights      Json?
+  healthScore             Int?
+  scoreFactors            Json?
+  valueParserVersion      String?
+  summaryValidationStatus String?
+  repairedAt              DateTime?
+  usesStructuredValues    Boolean             @default(false)
+  aiModelUsed             String?
+  processingTimeMs        Int?
+  sourceTextHash          String?
+  mockGenerated           Boolean             @default(false)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  shareLinks              DoctorShareLink[]
+  doctorQuestionSets      DoctorQuestionSet[]
+  translations            ReportTranslation[]
+  healthRisks             HealthRisk[]
+  timelineEvents          FamilyTimelineEvent[]
+  labTrendRecords         LabTrendRecord[]
+  reminderSuggestions     ReminderSuggestion[]
+  manualLabValues         ManualLabValue[]
+  chatThreads             ChatThread[]
+
+  @@index([userId])
+}
+
+model HealthRisk {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId   String?
+  familyMember     FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  documentId       String?
+  document         Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reportId         String?
+  report           Report?  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  category         String
+  canonicalRiskKey String?
+  title            String
+  level            String
+  message          String
+  evidence         Json?
+  suggestedActions Json?
+  source           String   @default("report")
+  status           String   @default("active")
+  detectedAt       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([documentId])
+  @@index([reportId])
+  @@index([category])
+  @@index([level])
+  @@index([status])
+  @@index([detectedAt])
+  @@index([canonicalRiskKey])
+  @@unique([userId, reportId, canonicalRiskKey])
+}
+
+model FamilyTimelineEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  documentId     String?
+  document       Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reportId       String?
+  report         Report?  @relation(fields: [reportId], references: [id], onDelete: SetNull)
+
+  type           String
+  title          String
+  description    String?
+  metadata       Json?
+  occurredAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([documentId])
+  @@index([reportId])
+  @@index([type])
+  @@index([occurredAt])
+}
+
+model LabTrendRecord {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  documentId     String?
+  document       Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reportId       String?
+  report         Report?  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  markerName     String
+  markerKey      String
+  value          Float?
+  unit           String?
+  normalMin      Float?
+  normalMax      Float?
+  status         String?
+  measuredAt     DateTime?
+  source         String   @default("report")
+  createdAt      DateTime @default(now())
+
+  @@unique([reportId, markerKey])
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([markerKey])
+  @@index([measuredAt])
+  @@index([reportId])
+}
+
+model ReminderSuggestion {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  documentId     String?
+  document       Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reportId       String?
+  report         Report?  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  type           String
+  title          String
+  message        String
+  suggestedDate  DateTime?
+  status         String   @default("pending")
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([reportId])
+  @@index([status])
+}
+
+model AppNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  href      String?
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model ReportTranslation {
+  id                      String   @id @default(cuid())
+  reportId                String
+  report                  Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  language                String
+  summary                 String
+  keyFindings             Json
+  abnormalValues          Json
+  foodRecommendations     Json
+  exerciseRecommendations Json
+  lifestyleAdvice         Json
+  riskFlags               Json
+  chartData               Json?
+  translatedAt            DateTime @default(now())
+  aiModelUsed             String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([reportId, language])
+  @@index([reportId])
+  @@index([language])
+}
+
+model HealthCondition {
+  id             String       @id @default(cuid())
+  userId         String
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  name           String
+  status         String       @default("active")
+  diagnosedOn    DateTime?
+  severity       String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+}
+
+model Allergy {
+  id             String       @id @default(cuid())
+  userId         String
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  name           String
+  reaction       String?
+  severity       String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+}
+
+model Medication {
+  id               String              @id @default(cuid())
+  userId           String
+  familyMemberId   String
+  familyMember     FamilyMember        @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  name             String
+  dosage           String?
+  frequency        String?
+  instructions     String?
+  startDate        DateTime?
+  endDate          DateTime?
+  refillDate       DateTime?
+  status           String              @default("active")
+  prescribedBy     String?
+  notes            String?
+  reminderEnabled  Boolean             @default(false)
+  reminderTimes    Json?
+  missedDoseCount  Int                 @default(0)
+  lastTakenAt      DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  doseLogs         MedicationDoseLog[]
+
+  @@index([userId])
+  @@index([familyMemberId])
+}
+
+model MedicationDoseLog {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  medicationId   String
+  medication     Medication   @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  scheduledAt    DateTime
+  status         String       @default("pending")
+  takenAt        DateTime?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([medicationId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model DoctorShareLink {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId       String
+  report         Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  token          String    @unique
+  recipientName  String?
+  recipientEmail String?
+  note           String?
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  accessCount    Int       @default(0)
+  lastAccessedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([reportId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model DoctorQuestionSet {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId       String
+  report         Report        @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  language       String        @default("en")
+  questions      Json
+  summary        String?
+  aiModelUsed    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@unique([reportId, language])
+  @@index([userId])
+  @@index([reportId])
+  @@index([familyMemberId])
+}
+
+model LabTestReference {
+  id          String   @id @default(cuid())
+  name        String
+  aliases     Json?
+  category    String
+  unit        String?
+  normalMin   Float?
+  normalMax   Float?
+  normalText  String?
+  explanation String
+  highMeaning String?
+  lowMeaning  String?
+  disclaimer  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([category])
+}
+
+model SymptomJournalEntry {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  title          String
+  symptoms       Json
+  severity       Int?
+  mood           String?
+  temperature    Float?
+  notes          String?
+  occurredAt     DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([occurredAt])
+  @@index([severity])
+}
+
+model CaregiverInvite {
+  id                 String   @id @default(cuid())
+  ownerUserId        String
+  owner              User     @relation("CaregiverInviteOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  invitedEmail       String
+  invitedName        String?
+  token              String   @unique
+  role               String   @default("viewer")
+  status             String   @default("pending")
+  canViewReports     Boolean  @default(true)
+  canViewFamily      Boolean  @default(true)
+  canAddNotes        Boolean  @default(false)
+  canManageReminders Boolean  @default(false)
+  expiresAt          DateTime
+  acceptedAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([ownerUserId])
+  @@index([invitedEmail])
+  @@index([token])
+  @@index([status])
+}
+
+model CaregiverAccess {
+  id                 String   @id @default(cuid())
+  ownerUserId        String
+  owner              User     @relation("CaregiverAccessOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  caregiverUserId    String
+  caregiver          User     @relation("CaregiverAccessCaregiver", fields: [caregiverUserId], references: [id], onDelete: Cascade)
+  role               String   @default("viewer")
+  canViewReports     Boolean  @default(true)
+  canViewFamily      Boolean  @default(true)
+  canAddNotes        Boolean  @default(false)
+  canManageReminders Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([ownerUserId, caregiverUserId])
+  @@index([ownerUserId])
+  @@index([caregiverUserId])
+}
+
+model EmergencyHealthCard {
+  id                       String        @id @default(cuid())
+  userId                   String
+  user                     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId           String?       @unique
+  familyMember             FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  publicToken              String        @unique
+  isEnabled                Boolean       @default(true)
+  includeAllergies         Boolean       @default(true)
+  includeMedications       Boolean       @default(true)
+  includeConditions        Boolean       @default(true)
+  includeEmergencyContacts Boolean       @default(true)
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([publicToken])
+}
+
+model UserPreference {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seniorMode             Boolean  @default(false)
+  language               String   @default("en")
+  fontScale              String   @default("normal")
+  highContrast           Boolean  @default(false)
+  reduceMotion           Boolean  @default(false)
+  allowCloudTranslation  Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model TranslationCache {
+  id              String   @id @default(cuid())
+  sourceHash      String
+  sourceLanguage  String   @default("en")
+  targetLanguage  String
+  context         String   @default("general")
+  sourceText      String
+  translatedText  String
+  provider        String   @default("openai")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([sourceHash, targetLanguage, context])
+  @@index([targetLanguage])
+  @@index([sourceHash])
+  @@index([context])
+}
+
+model VitalRecord {
+  id             String       @id @default(cuid())
+  userId         String
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  type           String
+  label          String
+  value          Float?
+  valueText      String?
+  unit           String?
+  measuredAt     DateTime     @default(now())
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([type])
+  @@index([measuredAt])
+}
+
+model Appointment {
+  id             String       @id @default(cuid())
+  userId         String
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  title          String
+  doctorName     String?
+  hospitalName   String?
+  appointmentAt  DateTime
+  status         String       @default("upcoming")
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([appointmentAt])
+}
+
+model EmergencyContact {
+  id             String       @id @default(cuid())
+  userId         String
+  familyMemberId String
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  name           String
+  relation       String?
+  phone          String
+  email          String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+}
+
+// --- Production platform models ---
+
+model ErrorLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  source     String
+  message    String
+  stack      String?
+  metadata   Json?
+  severity   String   @default("error")
+  isResolved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([source])
+  @@index([severity])
+  @@index([isResolved])
+  @@index([createdAt])
+}
+
+model BackgroundJob {
+  id          String    @id @default(cuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type        String
+  status      String    @default("queued")
+  priority    Int       @default(5)
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  payload     Json?
+  result      Json?
+  error       String?
+  runAfter    DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  failedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([priority])
+  @@index([runAfter])
+  @@index([createdAt])
+}
+
+model ManualLabValue {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  documentId     String?
+  document       Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportId       String?
+  report         Report?       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  testName       String
+  markerKey      String
+  category       String?
+  value          Float?
+  valueText      String?
+  unit           String?
+  normalMin      Float?
+  normalMax      Float?
+  normalText     String?
+  referenceRange String?
+  status         String?
+  confidence     Float?
+  sourceText     String?
+  sourcePage     Int?
+  notes          String?
+  measuredAt     DateTime?
+  source         String        @default("manual")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([familyMemberId])
+  @@index([documentId])
+  @@index([reportId])
+  @@index([markerKey])
+}
+
+model ChatThread {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId       String?
+  report         Report?       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  familyMemberId String?
+  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  type           String        @default("general")
+  title          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  messages       ChatMessage[]
+
+  @@index([userId])
+  @@index([reportId])
+  @@index([familyMemberId])
+  @@index([type])
+}
+
+model ChatMessage {
+  id        String     @id @default(cuid())
+  threadId  String
+  thread    ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  metadata  Json?
+  createdAt DateTime   @default(now())
+
+  @@index([threadId])
+  @@index([role])
+  @@index([createdAt])
+}
+
+model DataExportRequest {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      String    @default("queued")
+  format      String    @default("zip")
+  filePath    String?
+  error       String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
+}
+
+model AccountDeletionRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       String    @default("pending")
+  reason       String?
+  scheduledFor DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+model EmailLog {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  to        String
+  subject   String
+  type      String
+  status    String    @default("queued")
+  error     String?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  sentAt    DateTime?
+
+  @@index([userId])
+  @@index([to])
+  @@index([type])
+  @@index([status])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String
+  p256dh    String
+  auth      String
+  userAgent String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+model SupportTicket {
+  id        String                 @id @default(cuid())
+  userId    String?
+  user      User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category  String
+  subject   String
+  status    String                 @default("open")
+  priority  String                 @default("normal")
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  messages  SupportTicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
+}
+
+model SupportTicketMessage {
+  id         String        @id @default(cuid())
+  ticketId   String
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId   String?
+  senderRole String
+  message    String
+  createdAt  DateTime      @default(now())
+
+  @@index([ticketId])
+  @@index([senderId])
+}
+
+model AccessLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actorUserId  String?
+  action       String
+  resourceType String?
+  resourceId   String?
+  ipAddress    String?
+  userAgent    String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([actorUserId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+model QaChecklistItem {
+  id          String   @id @default(cuid())
+  group       String
+  key         String   @unique
+  label       String
+  description String?
+  status      String   @default("pending")
+  notes       String?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([group])
+  @@index([status])
+}
+
+model PaymentOrder {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            String
+  provider        String   @default("razorpay")
+  providerOrderId String   @unique
+  amountPaise     Int
+  currency        String   @default("INR")
+  status          String   @default("created")
+  receipt         String?
+  notes           Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  transactions    PaymentTransaction[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([plan])
+}
+
+model PaymentTransaction {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentOrderId    String
+  paymentOrder      PaymentOrder  @relation(fields: [paymentOrderId], references: [id], onDelete: Cascade)
+  provider          String        @default("razorpay")
+  providerOrderId   String
+  providerPaymentId String        @unique
+  providerSignature String?
+  amountPaise       Int
+  currency          String        @default("INR")
+  status            String        @default("captured")
+  method            String?
+  email             String?
+  contact           String?
+  rawPayload        Json?
+  verified          Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([paymentOrderId])
+  @@index([providerOrderId])
+}
+
+model BillingWebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String    @default("razorpay")
+  eventId     String?   @unique
+  eventType   String
+  signature   String?
+  verified    Boolean   @default(false)
+  processed   Boolean   @default(false)
+  payload     Json
+  error       String?
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([eventType])
+  @@index([processed])
+}
+
+// ── IFCT / Indian Food Composition Tables (NIN/ICMR 2017) ──
+
+model Food {
+  id             String   @id @default(cuid())
+  ifctCode       String?  @unique
+  name           String
+  normalizedName String
+  group          String?
+  scientificName String?
+  ediblePortion  Float?
+  description    String?
+  source         String   @default("Indian Food Composition Tables 2017, National Institute of Nutrition / ICMR")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  nutrients      FoodNutrient[]
+  aliases        FoodAlias[]
+  rawConversions FoodConversionRule[] @relation("RawFood")
+  cookedAsRaw    FoodConversionRule[] @relation("CookedFood")
+
+  @@index([normalizedName])
+  @@index([name])
+  @@index([group])
+  @@map("ifct_foods")
+}
+
+model Nutrient {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  name           String
+  normalizedName String
+  category       String
+  unit           String
+  description    String?
+  isMacro        Boolean  @default(false)
+  isVitamin      Boolean  @default(false)
+  isMineral      Boolean  @default(false)
+  isFattyAcid    Boolean  @default(false)
+  isAminoAcid    Boolean  @default(false)
+  isBioactive    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  foodValues     FoodNutrient[]
+  dietRules      DietRule[]
+
+  @@index([normalizedName])
+  @@index([category])
+  @@map("ifct_nutrients")
+}
+
+model FoodNutrient {
+  id          String   @id @default(cuid())
+  foodId      String
+  food        Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  nutrientId  String
+  nutrient    Nutrient @relation(fields: [nutrientId], references: [id], onDelete: Cascade)
+  value       Float?
+  unit        String
+  perAmount   Float    @default(100)
+  perUnit     String   @default("g")
+  sourceTable String?
+  sourcePage  Int?
+  confidence  Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([foodId, nutrientId, sourceTable])
+  @@index([foodId])
+  @@index([nutrientId])
+  @@index([value])
+  @@map("ifct_food_nutrients")
+}
+
+model FoodAlias {
+  id              String   @id @default(cuid())
+  foodId          String
+  food            Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  alias           String
+  language        String   @default("en")
+  normalizedAlias String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([foodId])
+  @@index([normalizedAlias])
+  @@index([alias])
+  @@map("ifct_food_aliases")
+}
+
+model FoodConversionRule {
+  id               String   @id @default(cuid())
+  rawFoodId        String
+  rawFood          Food     @relation("RawFood", fields: [rawFoodId], references: [id], onDelete: Cascade)
+  cookedFoodId     String?
+  cookedFood       Food?    @relation("CookedFood", fields: [cookedFoodId], references: [id], onDelete: SetNull)
+  cookedName       String
+  rawWeightGram    Float?
+  cookedWeightGram Float?
+  multiplier       Float?
+  note             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([rawFoodId])
+  @@index([cookedName])
+  @@map("ifct_food_conversion_rules")
+}
+
+model DietRule {
+  id            String   @id @default(cuid())
+  conditionName String
+  nutrientId    String?
+  nutrient        Nutrient? @relation(fields: [nutrientId], references: [id], onDelete: SetNull)
+  nutrientCode  String?
+  ruleType      String
+  thresholdMin  Float?
+  thresholdMax  Float?
+  unit          String?
+  description   String
+  severity      String   @default("info")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([conditionName])
+  @@index([nutrientCode])
+  @@map("ifct_diet_rules")
+}
+
+model IfctPipelineStatus {
+  id              String   @id @default("default")
+  phase           String   @default("idle")
+  lastRunAt       DateTime?
+  lastError       String?
+  foodsCount      Int      @default(0)
+  nutrientsCount  Int      @default(0)
+  foodNutrientRows Int     @default(0)
+  validationOk    Boolean  @default(false)
+  metadata        Json?
+  updatedAt       DateTime @updatedAt
+
+  @@map("ifct_pipeline_status")
+}
