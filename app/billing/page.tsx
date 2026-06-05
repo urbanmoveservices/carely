@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
 import Link from "next/link";
 import type { BillingPlan, PaymentHistoryItem, UsageSummary, UserProfile } from "@/types";
+import { getUsageQuotaView } from "@/lib/billing/usage-limits";
 import { useAuth } from "@/components/AuthProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -88,7 +89,8 @@ function BillingContent() {
     load();
   }, []);
 
-  const currentPlan = user?.currentPlan || usage?.plan || "free";
+  const currentPlan = usage?.effectivePlan || usage?.plan || user?.currentPlan || "free";
+  const quota = usage ? getUsageQuotaView(usage) : null;
 
   return (
     <MobileShell>
@@ -138,7 +140,9 @@ function BillingContent() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="font-semibold text-gray-900">{t("billing.currentPlan")}</h2>
-                <p className="text-sm text-gray-500">{usage.monthKey}</p>
+                <p className="text-sm text-gray-500">
+                  {usage.periodKey || usage.monthKey}
+                </p>
               </div>
               <Badge variant="info">{usage.planName}</Badge>
             </div>
@@ -150,28 +154,36 @@ function BillingContent() {
               )}
             </p>
             <div className="space-y-3">
-              <UsageProgress
-                label="Uploads this month"
-                used={usage.usage.uploadsUsed}
-                limit={usage.usage.uploadsLimit}
-              />
-              <UsageProgress
-                label="AI summaries"
-                used={usage.usage.aiSummariesUsed}
-                limit={usage.usage.aiSummariesLimit}
-              />
-              <UsageProgress
-                label="Family members"
-                used={usage.usage.familyMembersUsed}
-                limit={usage.usage.familyMembersLimit}
-              />
+              {quota && (
+                <>
+                  <UsageProgress
+                    label="Uploads this month"
+                    used={quota.uploadsUsed}
+                    limit={quota.uploadsLimit}
+                  />
+                  <UsageProgress
+                    label="AI summaries"
+                    used={quota.aiSummariesUsed}
+                    limit={quota.aiSummariesLimit}
+                  />
+                  <UsageProgress
+                    label="Family members"
+                    used={quota.familyMembersUsed}
+                    limit={quota.familyMembersLimit}
+                  />
+                </>
+              )}
               <p className="text-sm text-gray-600">
                 Caregiver sharing:{" "}
-                {usage.usage.caregiverSharing ? (
+                {usage.caregiverSharing ? (
                   <span className="text-green-700 font-medium">Included</span>
                 ) : (
                   <span className="text-gray-500">Family plan only</span>
                 )}
+              </p>
+              <p className="text-xs text-gray-500">
+                {usage.limitResetNote ||
+                  "Usage resets monthly based on Vaidya GPT server billing period, not your device date."}
               </p>
             </div>
           </section>

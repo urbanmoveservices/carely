@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import type { UsageSummary } from "@/types";
+import { getUsageQuotaView } from "@/lib/billing/usage-limits";
 import { Button } from "@/components/ui/Button";
 import { UsageProgress } from "@/components/billing/UsageProgress";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -47,9 +48,10 @@ export function MonthlyUsageCard() {
     );
   }
 
+  const quota = getUsageQuotaView(usage);
   const aiExhausted =
     usage.plan === "free" &&
-    usage.usage.aiSummariesUsed >= usage.usage.aiSummariesLimit;
+    quota.aiSummariesUsed >= quota.aiSummariesLimit;
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm mb-6">
@@ -72,13 +74,13 @@ export function MonthlyUsageCard() {
       <div className="space-y-3">
         <UsageProgress
           label={t("dashboard.uploads")}
-          used={usage.usage.uploadsUsed}
-          limit={usage.usage.uploadsLimit}
+          used={quota.uploadsUsed}
+          limit={quota.uploadsLimit}
         />
         <UsageProgress
           label={t("dashboard.aiSummaries")}
-          used={usage.usage.aiSummariesUsed}
-          limit={usage.usage.aiSummariesLimit}
+          used={quota.aiSummariesUsed}
+          limit={quota.aiSummariesLimit}
         />
       </div>
       {usage.warning && (

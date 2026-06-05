@@ -113,6 +113,23 @@ export interface PaymentHistoryItem {
 
 export interface UsageSummary {
   plan: PlanKey;
+  periodKey: string;
+  serverTime: string;
+  limits: {
+    uploads: number;
+    aiSummaries: number;
+    familyMembers: number;
+  };
+  used: {
+    uploads: number;
+    aiSummaries: number;
+    familyMembers: number;
+  };
+  remaining: {
+    uploads: number;
+    aiSummaries: number;
+    familyMembers: number;
+  };
   planName: string;
   priceLabel: string;
   description: string;
@@ -121,8 +138,18 @@ export interface UsageSummary {
   planExpiresAt?: string | null;
   billingProvider?: string | null;
   razorpayConfigured?: boolean;
-  monthKey: string;
-  usage: {
+  maxImagePagesPerReport: number;
+  caregiverSharing: boolean;
+  chatMessagesUsed?: number;
+  chatMessagesLimit?: number;
+  storedPlan?: PlanKey;
+  effectivePlan?: PlanKey;
+  limitResetNote?: string;
+  warning?: string;
+  /** @deprecated use periodKey */
+  monthKey?: string;
+  /** @deprecated use used/limits */
+  usage?: {
     uploadsUsed: number;
     uploadsLimit: number;
     aiSummariesUsed: number;
@@ -134,7 +161,6 @@ export interface UsageSummary {
     maxImagePagesPerReport: number;
     caregiverSharing: boolean;
   };
-  warning?: string;
 }
 
 export interface DocumentPageInfo {

@@ -105,9 +105,9 @@ export async function POST(req: NextRequest) {
     const memberCheck = await canAddFamilyMember(auth.payload.userId);
     if (!memberCheck.allowed) {
       return fail(
-        "Family member limit reached for your plan.",
+        memberCheck.message || "Family member limit reached for your plan.",
         403,
-        "FAMILY_MEMBER_LIMIT_REACHED"
+        memberCheck.code || "FAMILY_MEMBER_LIMIT_REACHED"
       );
     }
 

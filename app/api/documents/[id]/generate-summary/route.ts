@@ -118,9 +118,10 @@ export async function POST(
     const aiCheck = await canGenerateAiSummary(payload.userId);
     if (!aiCheck.allowed) {
       return fail(
-        "Monthly AI summary limit reached. Upgrade your plan to generate more summaries.",
+        aiCheck.message ||
+          "Monthly AI summary limit reached. Upgrade your plan to generate more summaries.",
         403,
-        "AI_LIMIT_REACHED"
+        aiCheck.code || "AI_SUMMARY_LIMIT_REACHED"
       );
     }
 
@@ -184,7 +185,7 @@ export async function POST(
         healthContext,
       });
 
-      await incrementAiSummaryUsage(payload.userId, req, payload.email);
+      await incrementAiSummaryUsage(payload.userId, report.id, req, payload.email);
 
       await auditUserAction(
         req,

@@ -102,9 +102,10 @@ export async function POST(req: NextRequest) {
     const uploadCheck = await canUpload(payload.userId);
     if (!uploadCheck.allowed) {
       return fail(
-        "Monthly upload limit reached. Upgrade your plan to upload more reports.",
+        uploadCheck.message ||
+          "Monthly upload limit reached. Upgrade your plan to upload more reports.",
         403,
-        "PLAN_LIMIT_REACHED"
+        uploadCheck.code || "UPLOAD_LIMIT_REACHED"
       );
     }
 
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
         return fail(mapped.message, mapped.status, mapped.code);
       }
 
-      await incrementUploadUsage(payload.userId, req, payload.email);
+      await incrementUploadUsage(payload.userId, documentId, req, payload.email);
 
       await auditUserAction(req, payload.userId, payload.email, AUDIT_ACTIONS.DOCUMENT_UPLOADED, {
         entityType: "document",
@@ -264,7 +265,7 @@ export async function POST(req: NextRequest) {
       return fail("File storage failed", 500, "STORAGE_FAILED");
     }
 
-    await incrementUploadUsage(payload.userId, req, payload.email);
+    await incrementUploadUsage(payload.userId, document.id, req, payload.email);
 
     await auditUserAction(req, payload.userId, payload.email, AUDIT_ACTIONS.DOCUMENT_UPLOADED, {
       entityType: "document",

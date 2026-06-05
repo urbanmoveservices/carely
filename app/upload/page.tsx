@@ -95,7 +95,7 @@ function UploadContent() {
   const [selectedMemberId, setSelectedMemberId] = useState<string>("");
   const [usage, setUsage] = useState<UsageSummary | null>(null);
 
-  const pageLimit = usage?.usage.maxImagePagesPerReport ?? 3;
+  const pageLimit = usage?.maxImagePagesPerReport ?? usage?.usage?.maxImagePagesPerReport ?? 3;
   const planName = usage?.planName ?? "Free";
   const overPageLimit = multiFiles.length > pageLimit;
 

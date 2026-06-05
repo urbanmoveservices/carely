@@ -141,9 +141,10 @@ async function resolveLanguage(userId: string, language?: string) {
 async function assertChatAllowed(userId: string, email: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { currentPlan: true },
+    select: { currentPlan: true, subscriptionEndsAt: true },
   });
-  const plan = user?.currentPlan ?? "free";
+  const { getEffectivePlan } = await import("@/lib/billing/usage-limits");
+  const plan = getEffectivePlan(user);
 
   if (!shouldBypassAuthRateLimit(email)) {
     const burst = checkChatBurstLimit(userId);

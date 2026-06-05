@@ -12,6 +12,12 @@ const CODE_MESSAGES: Record<string, string> = {
   UPLOAD_FAILED: "Upload failed. Check the file and try again.",
   PLAN_LIMIT_REACHED:
     "Monthly upload limit reached for your plan. Upgrade or wait until next month.",
+  UPLOAD_LIMIT_REACHED:
+    "Monthly upload limit reached. Usage resets on the Vaidya GPT server billing period, not your device date.",
+  AI_SUMMARY_LIMIT_REACHED:
+    "Monthly AI summary limit reached. Usage resets on the Vaidya GPT server billing period, not your device date.",
+  FAMILY_MEMBER_LIMIT_REACHED:
+    "Family member limit reached for your plan.",
   IMAGE_PAGE_LIMIT_REACHED:
     "Too many image pages for your plan. Remove pages or upgrade to Pro.",
   REPORT_SAVE_FAILED: "Could not save the report. Please try again.",
