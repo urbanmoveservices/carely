@@ -7,7 +7,7 @@ import { parseLabValuesFromText, LAB_PARSER_VERSION } from "../lib/lab-value-par
 import { parseAndSaveLabValues, loadStructuredLabValues } from "../lib/lab-value-service";
 import { validateReportSummary } from "../lib/ai/report-summary-validator";
 import { repairReportSummary } from "../lib/ai/report-summary-repair";
-import { computeHealthScoreFromLabs } from "../lib/health-score";
+import { computeHealthScoreFromLabValues } from "../lib/health-score";
 import { extractAndSaveHealthRisks } from "../lib/health-risk-extractor";
 import { extractAndSaveLabTrends } from "../lib/lab-trend-extractor";
 import { loadReportPostProcessingContext } from "../lib/report-post-processing";
@@ -60,6 +60,8 @@ async function main() {
   let labValuesParsed = 0;
   let unknownRemoved = 0;
   let risksMerged = 0;
+  let normalRisksRemoved = 0;
+  let scoreRecalculated = 0;
 
   for (const report of reports) {
     scanned++;
@@ -84,13 +86,25 @@ async function main() {
       parsed
     );
 
-    const needsRepair = !before.valid || before.hasUnknownFindings;
+    const structuredPreview = parsed;
+    const scorePreview = computeHealthScoreFromLabValues(
+      structuredPreview,
+      report.healthScore ?? undefined
+    );
+
+    const needsScoreRepair = (report.healthScore ?? null) !== scorePreview.score;
+    const needsRepair =
+      !before.valid || before.hasUnknownFindings || needsScoreRepair;
     if (!needsRepair && parsed.length === 0) continue;
 
     if (dryRun) {
       console.log("[dry-run] would repair", report.id, {
         parsed: parsed.length,
         issues: before.issues.length,
+        oldScore: report.healthScore,
+        newScore: scorePreview.score,
+        factorsCount: scorePreview.factors.length,
+        scoreSource: scorePreview.scoreSource,
       });
       continue;
     }
@@ -129,7 +143,16 @@ async function main() {
     const after = validateReportSummary(fixed, structured);
     if (before.hasUnknownFindings && !after.hasUnknownFindings) unknownRemoved++;
 
-    const { score, factors } = computeHealthScoreFromLabs(structured);
+    const oldScore = report.healthScore;
+    const { score, factors, scoreSource } = computeHealthScoreFromLabValues(
+      structured,
+      report.healthScore ?? undefined
+    );
+    if (oldScore !== score) scoreRecalculated++;
+
+    const risksBefore = await prisma.healthRisk.count({
+      where: { reportId: report.id, userId: report.userId },
+    });
 
     await prisma.report.update({
       where: { id: report.id },
@@ -141,6 +164,7 @@ async function main() {
         riskFlags: fixed.riskFlags as object,
         healthScore: score,
         scoreFactors: factors as object,
+        scoreSource,
         valueParserVersion: LAB_PARSER_VERSION,
         summaryValidationStatus: after.valid ? "repaired" : "repaired_partial",
         repairedAt: new Date(),
@@ -165,6 +189,9 @@ async function main() {
       structuredLabValues: structured,
     });
     risksMerged += risks.length;
+    if (risksBefore > risks.length) {
+      normalRisksRemoved += risksBefore - risks.length;
+    }
 
     await extractAndSaveLabTrends({
       userId: report.userId,
@@ -180,7 +207,12 @@ async function main() {
     });
 
     repaired++;
-    console.log("repaired", report.id, report.document.originalFilename);
+    console.log("repaired", report.id, report.document.originalFilename, {
+      oldScore,
+      newScore: score,
+      factors: factors.length,
+      scoreSource,
+    });
   }
 
   console.log(
@@ -192,6 +224,8 @@ async function main() {
         labValuesParsed,
         unknownFindingsRemoved: unknownRemoved,
         healthRisksWritten: risksMerged,
+        scoresRecalculated: scoreRecalculated,
+        normalRisksRemoved,
       },
       null,
       2

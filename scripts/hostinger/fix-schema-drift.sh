@@ -25,6 +25,7 @@ ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "valueParserVersion" TEXT;
 ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "summaryValidationStatus" TEXT;
 ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "repairedAt" TIMESTAMP(3);
 ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "usesStructuredValues" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "scoreSource" TEXT;
 EOF
 
 echo "Schema drift fix applied on database: $DB"

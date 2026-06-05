@@ -12,7 +12,7 @@ import {
   repairReportSummary,
   buildDeterministicSummary,
 } from "@/lib/ai/report-summary-repair";
-import { computeHealthScoreFromLabs } from "@/lib/health-score";
+import { computeHealthScoreFromLabValues } from "@/lib/health-score";
 import type { HealthScoreFactor } from "@/lib/health-score";
 
 export type IntelligencePipelineResult = {
@@ -22,6 +22,7 @@ export type IntelligencePipelineResult = {
   structuredValues: ParsedLabValue[];
   validationStatus: string;
   scoreFactors: HealthScoreFactor[];
+  scoreSource: "structured_lab_values" | "ai_fallback";
   repaired: boolean;
   usedDeterministicFallback: boolean;
 };
@@ -103,7 +104,10 @@ export async function runReportIntelligencePipeline(params: {
     validation = validateReportSummary(result, structuredValues);
   }
 
-  const { score, factors } = computeHealthScoreFromLabs(structuredValues);
+  const { score, factors, scoreSource } = computeHealthScoreFromLabValues(
+    structuredValues,
+    rawResult.healthScore
+  );
   result.healthScore = score;
 
   const validationStatus = validation.valid
@@ -121,6 +125,7 @@ export async function runReportIntelligencePipeline(params: {
     structuredValues,
     validationStatus,
     scoreFactors: factors,
+    scoreSource,
     repaired,
     usedDeterministicFallback,
   };

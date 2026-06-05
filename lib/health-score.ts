@@ -1,113 +1,218 @@
 import type { ParsedLabValue } from "@/lib/lab-value-parser";
+import {
+  calculateMarkerDeduction,
+  getScoreGroup,
+  GROUP_CAPS,
+  maxSeverity,
+  shouldScoreLabValue,
+  type AbnormalSeverity,
+  type MarkerDeduction,
+  type ScoreGroup,
+} from "@/lib/health-score-rules";
 
 export type HealthScoreFactor = {
   canonicalName: string;
+  displayName: string;
+  category: string;
+  group?: ScoreGroup;
   value: number | string;
   unit: string | null;
+  referenceRange: string | null;
   status: string;
-  severity: "mild" | "moderate" | "major";
+  severity: AbnormalSeverity;
   deduction: number;
+  deductionApplied?: number;
   reason: string;
+  combined?: boolean;
 };
 
 export type HealthScoreResult = {
   score: number;
   factors: HealthScoreFactor[];
+  scoreSource: "structured_lab_values" | "ai_fallback";
 };
 
-function severityForMarker(v: ParsedLabValue): HealthScoreFactor | null {
-  if (v.status !== "high" && v.status !== "low") return null;
-  const n = v.numericValue;
-  if (n == null) {
+const LIVER_ENZYMES = new Set(["sgot", "sgpt"]);
+
+function clampScore(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function scoreWhenAllNormal(parsedCount: number): number {
+  if (parsedCount >= 5) return 100;
+  if (parsedCount >= 3) return 98;
+  if (parsedCount >= 1) return 96;
+  return 95;
+}
+
+function applyGroupCaps(markers: MarkerDeduction[]): {
+  factors: HealthScoreFactor[];
+  totalDeduction: number;
+} {
+  const byGroup = new Map<ScoreGroup, MarkerDeduction[]>();
+  for (const m of markers) {
+    const list = byGroup.get(m.group) || [];
+    list.push(m);
+    byGroup.set(m.group, list);
+  }
+
+  const factors: HealthScoreFactor[] = [];
+  let totalDeduction = 0;
+
+  for (const [group, groupMarkers] of byGroup) {
+    const groupSeverity = groupMarkers.reduce(
+      (max, m) => maxSeverity(max, m.severity),
+      "mild" as AbnormalSeverity
+    );
+    const rawSum = groupMarkers.reduce((s, m) => s + m.rawDeduction, 0);
+    const cap = GROUP_CAPS[group]?.[groupSeverity] ?? rawSum;
+    const appliedTotal = Math.min(rawSum, cap);
+    totalDeduction += appliedTotal;
+
+    const scale = rawSum > 0 ? appliedTotal / rawSum : 1;
+
+    if (group === "liver" && groupMarkers.filter((m) => LIVER_ENZYMES.has(m.canonicalName)).length >= 2) {
+      const liverSubset = groupMarkers.filter((m) => LIVER_ENZYMES.has(m.canonicalName));
+      const liverRaw = liverSubset.reduce((s, m) => s + m.rawDeduction, 0);
+      const liverApplied = Math.min(liverRaw * scale, cap);
+      const liverSeverity = liverSubset.reduce(
+        (max, m) => maxSeverity(max, m.severity),
+        "mild" as AbnormalSeverity
+      );
+
+      factors.push({
+        canonicalName: "liver_enzymes",
+        displayName: "Liver enzymes elevated",
+        category: "liver",
+        group: "liver",
+        value: liverSubset.map((m) => `${m.displayName}: ${m.value}`).join("; "),
+        unit: null,
+        referenceRange: null,
+        status: "high",
+        severity: liverSeverity,
+        deduction: Math.round(liverApplied),
+        deductionApplied: Math.round(liverApplied),
+        reason:
+          "Multiple liver enzymes (e.g. AST/SGOT and ALT/SGPT) are above reference ranges.",
+        combined: true,
+      });
+
+      for (const m of groupMarkers) {
+        if (!LIVER_ENZYMES.has(m.canonicalName)) {
+          const applied = Math.round(m.rawDeduction * scale);
+          factors.push({
+            canonicalName: m.canonicalName,
+            displayName: m.displayName,
+            category: m.category,
+            group: m.group,
+            value: m.value,
+            unit: m.unit,
+            referenceRange: m.referenceRange,
+            status: m.status,
+            severity: m.severity,
+            deduction: m.rawDeduction,
+            deductionApplied: applied,
+            reason: m.reason,
+          });
+        } else {
+          factors.push({
+            canonicalName: m.canonicalName,
+            displayName: m.displayName,
+            category: m.category,
+            group: m.group,
+            value: m.value,
+            unit: m.unit,
+            referenceRange: m.referenceRange,
+            status: m.status,
+            severity: m.severity,
+            deduction: m.rawDeduction,
+            deductionApplied: Math.round(m.rawDeduction * scale),
+            reason: m.reason,
+            combined: true,
+          });
+        }
+      }
+      continue;
+    }
+
+    for (const m of groupMarkers) {
+      const applied = Math.round(m.rawDeduction * scale);
+      factors.push({
+        canonicalName: m.canonicalName,
+        displayName: m.displayName,
+        category: m.category,
+        group: m.group,
+        value: m.value,
+        unit: m.unit,
+        referenceRange: m.referenceRange,
+        status: m.status,
+        severity: m.severity,
+        deduction: m.rawDeduction,
+        deductionApplied: applied,
+        reason: m.reason,
+      });
+    }
+  }
+
+  factors.sort((a, b) => (b.deductionApplied ?? b.deduction) - (a.deductionApplied ?? a.deduction));
+  return { factors, totalDeduction };
+}
+
+export function computeHealthScoreFromLabValues(
+  values: ParsedLabValue[],
+  aiFallbackScore?: number
+): HealthScoreResult {
+  const scorable = values.filter(shouldScoreLabValue);
+  const meaningfulParsed = values.filter(
+    (v) => v.confidence >= 0.5 && v.status !== "unknown"
+  );
+
+  if (scorable.length === 0) {
+    const fallback =
+      typeof aiFallbackScore === "number" && Number.isFinite(aiFallbackScore)
+        ? clampScore(aiFallbackScore)
+        : null;
+
     return {
-      canonicalName: v.canonicalName,
-      value: v.value,
-      unit: v.unit,
-      status: v.status,
-      severity: "mild",
-      deduction: 5,
-      reason: `${v.testName} is ${v.status}`,
+      score: fallback ?? 95,
+      factors: [],
+      scoreSource: "ai_fallback",
     };
   }
 
-  let severity: HealthScoreFactor["severity"] = "mild";
-  let deduction = 5;
-  let reason = `${v.testName} is ${v.status}`;
+  const markers: MarkerDeduction[] = [];
+  for (const v of scorable) {
+    const m = calculateMarkerDeduction(v);
+    if (m) markers.push(m);
+  }
 
-  if (v.canonicalName === "tsh" && v.status === "high") {
-    if (n > 10) {
-      severity = "major";
-      deduction = 18;
-      reason = "TSH markedly elevated — thyroid follow-up suggested";
-    } else if (n > 4.2) {
-      severity = "moderate";
-      deduction = 12;
-      reason = "TSH above reference range";
-    }
-  } else if (v.canonicalName === "ldl" && v.status === "high") {
-    if (n >= 160) {
-      severity = "major";
-      deduction = 15;
-    } else if (n >= 130) {
-      severity = "moderate";
-      deduction = 10;
-      reason = "LDL cholesterol elevated";
-    } else {
-      severity = "mild";
-      deduction = 6;
-      reason = "LDL cholesterol mildly above range";
-    }
-  } else if (v.canonicalName === "bilirubin_direct" && v.status === "high") {
-    severity = n > 1 ? "moderate" : "mild";
-    deduction = severity === "moderate" ? 10 : 5;
-    reason = "Direct bilirubin above reference";
-  } else if (v.canonicalName === "pcv" && v.status === "low") {
-    severity = n < 35 ? "moderate" : "mild";
-    deduction = severity === "moderate" ? 10 : 5;
-    reason = "Packed cell volume below reference";
-  } else if (v.canonicalName === "hba1c" && v.status === "high") {
-    severity = n >= 6.5 ? "major" : n >= 5.7 ? "moderate" : "mild";
-    deduction = severity === "major" ? 16 : severity === "moderate" ? 10 : 5;
-    reason = "HbA1c above target range";
-  } else if (v.canonicalName === "fasting_glucose" && v.status === "high") {
-    severity = n >= 126 ? "major" : n >= 100 ? "moderate" : "mild";
-    deduction = severity === "major" ? 14 : severity === "moderate" ? 8 : 4;
-    reason = "Fasting glucose elevated";
-  } else if (v.canonicalName === "creatinine" && v.status === "high") {
-    severity = "moderate";
-    deduction = 12;
-    reason = "Creatinine above reference";
-  } else if (v.canonicalName === "hemoglobin" && v.status === "low") {
-    severity = n < 10 ? "major" : n < 12 ? "moderate" : "mild";
-    deduction = severity === "major" ? 16 : severity === "moderate" ? 10 : 5;
-    reason = "Hemoglobin below reference";
-  } else {
-    deduction = v.status === "high" ? 6 : 5;
+  if (markers.length === 0) {
+    return {
+      score: scoreWhenAllNormal(meaningfulParsed.length),
+      factors: [],
+      scoreSource: "structured_lab_values",
+    };
+  }
+
+  const { factors, totalDeduction } = applyGroupCaps(markers);
+  const score = clampScore(100 - totalDeduction);
+
+  if (markers.length > 0 && score >= 100) {
+    return {
+      score: 94,
+      factors,
+      scoreSource: "structured_lab_values",
+    };
   }
 
   return {
-    canonicalName: v.canonicalName,
-    value: n,
-    unit: v.unit,
-    status: v.status,
-    severity,
-    deduction,
-    reason,
+    score,
+    factors,
+    scoreSource: "structured_lab_values",
   };
 }
 
-export function computeHealthScoreFromLabs(
-  values: ParsedLabValue[]
-): HealthScoreResult {
-  const factors: HealthScoreFactor[] = [];
-  for (const v of values) {
-    const f = severityForMarker(v);
-    if (f) factors.push(f);
-  }
-
-  factors.sort((a, b) => b.deduction - a.deduction);
-  const totalDeduction = factors.reduce((s, f) => s + f.deduction, 0);
-  const score = Math.max(0, Math.min(100, 100 - totalDeduction));
-
-  return { score, factors };
+/** @deprecated Use computeHealthScoreFromLabValues */
+export function computeHealthScoreFromLabs(values: ParsedLabValue[]): HealthScoreResult {
+  return computeHealthScoreFromLabValues(values);
 }

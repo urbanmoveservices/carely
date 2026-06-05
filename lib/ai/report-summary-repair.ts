@@ -7,7 +7,7 @@ import {
   THYROID_CANONICAL,
   LIPID_CANONICAL,
 } from "@/lib/lab-test-aliases";
-import { computeHealthScoreFromLabs } from "@/lib/health-score";
+import { computeHealthScoreFromLabValues } from "@/lib/health-score";
 
 const STRUCTURED_NOTE =
   "Summary generated using structured lab values from your uploaded report.";
@@ -290,7 +290,10 @@ export function repairReportSummary(
     chartLabels.add(label.toLowerCase());
   }
 
-  const { score, factors } = computeHealthScoreFromLabs(structured);
+  const { score, factors } = computeHealthScoreFromLabValues(
+    structured,
+    summary.healthScore
+  );
 
   let text = removeGenericUnknownLabText(summary.summary || "", structured);
   if (!text.includes(STRUCTURED_NOTE)) {
@@ -354,7 +357,7 @@ export function buildDeterministicSummary(
 
   const keyFindings = dedupeKeyFindings([...abnormal, ...normal].map(buildFindingFromParsed));
   const abnormalValues = dedupeAbnormalValues(abnormal.map(buildAbnormalFromParsed));
-  const { score } = computeHealthScoreFromLabs(structured);
+  const { score } = computeHealthScoreFromLabValues(structured);
 
   const lines = abnormal.map(
     (v) =>

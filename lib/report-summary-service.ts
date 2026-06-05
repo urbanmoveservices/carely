@@ -43,6 +43,7 @@ function toPrismaReportCreateData(params: {
   aiModelUsed: string;
   processingTimeMs: number;
   scoreFactors?: unknown;
+  scoreSource?: string;
   validationStatus?: string;
   usesStructuredValues?: boolean;
 }): Prisma.ReportUncheckedCreateInput {
@@ -60,6 +61,7 @@ function toPrismaReportCreateData(params: {
     contextualInsights: (params.result.contextualInsights ?? []) as unknown as Prisma.InputJsonValue,
     healthScore: params.result.healthScore ?? null,
     scoreFactors: (params.scoreFactors ?? undefined) as Prisma.InputJsonValue | undefined,
+    scoreSource: params.scoreSource ?? null,
     valueParserVersion: LAB_PARSER_VERSION,
     summaryValidationStatus: params.validationStatus ?? null,
     usesStructuredValues: params.usesStructuredValues ?? false,
@@ -114,8 +116,15 @@ export async function generateAndPersistReport(params: {
     replaceParsed: true,
   });
 
-  const { result, model, durationMs, scoreFactors, validationStatus, structuredValues } =
-    pipeline;
+  const {
+    result,
+    model,
+    durationMs,
+    scoreFactors,
+    scoreSource,
+    validationStatus,
+    structuredValues,
+  } = pipeline;
 
   const reportData = toPrismaReportCreateData({
     userId: params.userId,
@@ -124,6 +133,7 @@ export async function generateAndPersistReport(params: {
     aiModelUsed: model,
     processingTimeMs: durationMs,
     scoreFactors,
+    scoreSource,
     validationStatus,
     usesStructuredValues: structuredValues.length > 0,
   });

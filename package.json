@@ -20,6 +20,7 @@
     "reports:backfill": "tsx scripts/backfill-report-post-processing.ts",
     "reports:repair-values": "tsx scripts/repair-report-summaries.ts",
     "test:lab-parser": "tsx scripts/lab-parser-test.ts",
+    "test:health-score": "tsx scripts/health-score-test.ts",
     "test:summary-repair": "tsx scripts/lab-summary-repair-test.ts",
     "jobs:worker": "tsx scripts/job-worker.ts",
     "jobs:retry-failed": "tsx scripts/retry-failed-jobs.ts",

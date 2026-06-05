@@ -387,6 +387,7 @@ model Report {
   contextualInsights      Json?
   healthScore             Int?
   scoreFactors            Json?
+  scoreSource             String?
   valueParserVersion      String?
   summaryValidationStatus String?
   repairedAt              DateTime?

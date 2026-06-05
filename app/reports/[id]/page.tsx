@@ -377,6 +377,11 @@ function ReportContent() {
                     {t("report.healthScore")}
                   </p>
                   <p className="text-xs text-gray-400">{t("report.outOf100")}</p>
+                  <p className="text-xs text-gray-400 mt-2 max-w-[10rem]">
+                    {report.scoreSource === "ai_fallback"
+                      ? t("report.scoreAiFallbackNote")
+                      : t("report.scoreStructuredNote")}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -403,6 +408,57 @@ function ReportContent() {
             </CardContent>
           </Card>
         </div>
+
+        {report.scoreFactors && report.scoreFactors.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <CircleHelp className="h-5 w-5 text-brand-600" />
+                  {t("report.whyThisScore")}
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {report.scoreFactors
+                  .filter((f) => !f.combined || f.canonicalName === "liver_enzymes")
+                  .slice(0, 8)
+                  .map((factor, i) => (
+                    <div
+                      key={`${factor.canonicalName}-${i}`}
+                      className="rounded-lg border border-gray-100 bg-gray-50 p-3"
+                    >
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {factor.displayName || factor.canonicalName}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {String(factor.value)}
+                            {factor.unit ? ` ${factor.unit}` : ""}
+                            {factor.referenceRange
+                              ? ` · ref ${factor.referenceRange}`
+                              : ""}
+                            {" · "}
+                            {translateMetricStatus(t, factor.status)}
+                          </p>
+                        </div>
+                        <Badge variant="warning">
+                          {tParams("report.scoreFactorDeduction", {
+                            points: String(
+                              factor.deductionApplied ?? factor.deduction
+                            ),
+                          })}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2">{factor.reason}</p>
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {report.contextualInsights && report.contextualInsights.length > 0 && (
           <Card className="mb-6">

@@ -418,6 +418,22 @@ export interface ChartDataPoint {
   unit?: string;
 }
 
+export interface HealthScoreFactorView {
+  canonicalName: string;
+  displayName: string;
+  category: string;
+  group?: string;
+  value: number | string;
+  unit: string | null;
+  referenceRange: string | null;
+  status: string;
+  severity: "mild" | "moderate" | "major" | "critical";
+  deduction: number;
+  deductionApplied?: number;
+  reason: string;
+  combined?: boolean;
+}
+
 export interface ReportDetail {
   id: string;
   documentId: string;
@@ -431,6 +447,10 @@ export interface ReportDetail {
   chartData: ChartDataPoint[];
   contextualInsights?: ContextualInsight[];
   healthScore?: number;
+  scoreFactors?: HealthScoreFactorView[];
+  scoreSource?: string | null;
+  usesStructuredValues?: boolean;
+  summaryValidationStatus?: string | null;
   aiModelUsed: string | null;
   processingTimeMs: number | null;
   createdAt: string;

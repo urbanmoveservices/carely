@@ -22,6 +22,9 @@ import {
   riskMessageForLab,
   riskLevelFromLab,
   detectCategoryFromCanonical,
+  shouldCreateRiskForLab,
+  liverEnzymesElevatedKey,
+  isLiverEnzymeMarker,
 } from "@/lib/health-risk-from-labs";
 
 type ReportLike = {
@@ -192,8 +195,39 @@ export async function extractAndSaveHealthRisks(params: {
     draft.push(card);
   };
 
-  for (const v of params.structuredLabValues || []) {
-    if (v.status !== "high" && v.status !== "low") continue;
+  const structuredLabs = params.structuredLabValues || [];
+  const abnormalLabs = structuredLabs.filter(shouldCreateRiskForLab);
+  const elevatedLiverEnzymes = abnormalLabs.filter(
+    (v) => isLiverEnzymeMarker(v.canonicalName) && v.status === "high"
+  );
+
+  if (elevatedLiverEnzymes.length >= 2) {
+    const names = elevatedLiverEnzymes
+      .map((v) => v.testName || v.canonicalName)
+      .join(", ");
+    addCard({
+      category: "liver",
+      canonicalRiskKey: liverEnzymesElevatedKey(),
+      title: "Liver enzymes elevated",
+      level: "warning",
+      message: `Uploaded report shows elevated liver enzymes (${names}). Based on uploaded report data—not a final diagnosis.`,
+      evidence: elevatedLiverEnzymes.map((v) => ({
+        label: v.testName,
+        value: v.numericValue ?? v.value,
+        unit: v.unit,
+        normalRange: v.referenceRange,
+        status: v.status,
+        source: "structuredLabValues",
+      })) as Prisma.InputJsonValue,
+      suggestedActions: DEFAULT_SUGGESTED_ACTIONS as Prisma.InputJsonValue,
+      source: "report",
+    });
+  }
+
+  for (const v of abnormalLabs) {
+    if (elevatedLiverEnzymes.length >= 2 && isLiverEnzymeMarker(v.canonicalName)) {
+      continue;
+    }
     const canonicalRiskKey = canonicalRiskKeyForLab(v);
     addCard({
       category: detectCategoryFromCanonical(v.canonicalName),

@@ -60,6 +60,7 @@ export async function GET(
       chartData: report.chartData,
       healthScore: report.healthScore,
       scoreFactors: report.scoreFactors,
+      scoreSource: report.scoreSource,
       valueParserVersion: report.valueParserVersion,
       summaryValidationStatus: report.summaryValidationStatus,
       repairedAt: report.repairedAt?.toISOString() ?? null,

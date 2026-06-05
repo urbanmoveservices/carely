@@ -288,6 +288,12 @@ export const en: Record<string, string> = {
   "report.myself": "Myself",
   "report.healthScore": "Health Score",
   "report.outOf100": "out of 100",
+  "report.whyThisScore": "Why this score?",
+  "report.scoreStructuredNote":
+    "Score is based on parsed report values, not a diagnosis.",
+  "report.scoreAiFallbackNote":
+    "Score estimated from AI summary because structured lab values were not available.",
+  "report.scoreFactorDeduction": "−{points} pts",
   "report.summary": "Summary",
   "report.contextBasedNote":
     "Analysis based on your uploaded report and the health context you provided.",

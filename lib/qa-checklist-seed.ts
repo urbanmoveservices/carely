@@ -106,7 +106,12 @@ export const QA_CHECKLIST_ITEMS: QaSeedItem[] = [
   item("ai_summary", "ai_summary_structured_values", "Summary uses parsed values", "Prompt includes structured values; no generic Unknown"),
   item("ai_summary", "unknown_values_prevented", "Unknown values prevented", "Validator/repair blocks Thyroid/Cholesterol Unknown when TSH/LDL parsed"),
   item("ai_summary", "health_score_server_side", "Health score server-side", "Score computed from structured abnormal values, not OpenAI only"),
+  item("ai_summary", "health_score_universal_engine", "Universal health score engine", "Abnormal structured values reduce score with group caps"),
+  item("ai_summary", "health_score_factors_shown", "Score factors shown", "Report page explains deductions when score < 100"),
+  item("ai_summary", "health_score_egfr_normal", "Normal eGFR not flagged", "eGFR >= 90 does not reduce score or create warning risk"),
+  item("ai_summary", "health_score_source_stored", "Score source stored", "structured_lab_values vs ai_fallback on Report"),
   item("ai_summary", "risk_cards_deduplicated", "Risk cards deduplicated", "canonicalRiskKey upsert; specific marker titles"),
+  item("ai_summary", "risk_dedupe_universal", "Risk dedupe universal", "Liver enzyme group; no duplicate marker cards"),
   item("ai_summary", "reports_repair_script", "Repair existing reports", "npm run reports:repair-values"),
   item("ai_summary", "report_context_separated", "Report vs user context", "Uploaded report vs questionnaire wording separated"),
 

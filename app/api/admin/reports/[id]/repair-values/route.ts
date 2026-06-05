@@ -6,7 +6,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { parseAndSaveLabValues, loadStructuredLabValues } from "@/lib/lab-value-service";
 import { repairReportSummary } from "@/lib/ai/report-summary-repair";
 import { validateReportSummary } from "@/lib/ai/report-summary-validator";
-import { computeHealthScoreFromLabs } from "@/lib/health-score";
+import { computeHealthScoreFromLabValues } from "@/lib/health-score";
 import { extractAndSaveHealthRisks } from "@/lib/health-risk-extractor";
 import { extractAndSaveLabTrends } from "@/lib/lab-trend-extractor";
 import { loadReportPostProcessingContext } from "@/lib/report-post-processing";
@@ -79,7 +79,10 @@ export async function POST(
     );
 
     const validation = validateReportSummary(fixed, structured);
-    const { score, factors } = computeHealthScoreFromLabs(structured);
+    const { score, factors, scoreSource } = computeHealthScoreFromLabValues(
+      structured,
+      report.healthScore ?? undefined
+    );
 
     await prisma.report.update({
       where: { id: report.id },
@@ -91,6 +94,7 @@ export async function POST(
         riskFlags: fixed.riskFlags as object,
         healthScore: score,
         scoreFactors: factors as object,
+        scoreSource,
         valueParserVersion: LAB_PARSER_VERSION,
         summaryValidationStatus: validation.valid ? "repaired" : "repaired_partial",
         repairedAt: new Date(),

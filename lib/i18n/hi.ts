@@ -238,6 +238,12 @@ export const hi: Record<string, string> = {
   "report.myself": "स्वयं",
   "report.healthScore": "स्वास्थ्य स्कोर",
   "report.outOf100": "100 में से",
+  "report.whyThisScore": "यह स्कोर क्यों?",
+  "report.scoreStructuredNote":
+    "स्कोर पार्स किए गए रिपोर्ट मानों पर आधारित है, निदान नहीं।",
+  "report.scoreAiFallbackNote":
+    "संरचित लैब मान उपलब्ध न होने पर AI सारांश से स्कोर अनुमानित है।",
+  "report.scoreFactorDeduction": "−{points} अंक",
   "report.summary": "सारांश",
   "report.keyFindings": "मुख्य निष्कर्ष",
   "report.abnormalValues": "असामान्य मान",
