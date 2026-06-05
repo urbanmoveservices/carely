@@ -8,6 +8,8 @@ import {
   LIPID_CANONICAL,
 } from "@/lib/lab-test-aliases";
 import { computeHealthScoreFromLabValues } from "@/lib/health-score";
+import { ensureRecommendationCounts } from "@/lib/ai/recommendation-limits";
+import { toIndianFoodAlternative } from "@/lib/diet/indian-diet-context";
 
 const STRUCTURED_NOTE =
   "Summary generated using structured lab values from your uploaded report.";
@@ -207,7 +209,7 @@ function sanitizeRecommendationLines(
 ): string[] {
   if (!lines?.length) return lines ?? [];
   return lines
-    .map((line) => removeGenericUnknownLabText(line, structured))
+    .map((line) => toIndianFoodAlternative(removeGenericUnknownLabText(line, structured)))
     .filter((line) => {
       if (!line.trim()) return false;
       return !textLooksGenericUnknown(line, new Set(structured.map((v) => v.canonicalName)));
@@ -327,6 +329,19 @@ export function repairReportSummary(
         !textLooksGenericUnknown(`${ins.title} ${ins.message}`, canonical)
     );
 
+  const sanitizedFood = sanitizeRecommendationLines(summary.foodRecommendations, structured);
+  const sanitizedExercise = sanitizeRecommendationLines(
+    summary.exerciseRecommendations,
+    structured
+  );
+  const sanitizedLifestyle = sanitizeRecommendationLines(summary.lifestyleAdvice, structured);
+  const limited = ensureRecommendationCounts(
+    sanitizedFood,
+    sanitizedExercise,
+    sanitizedLifestyle,
+    structured
+  );
+
   return {
     ...summary,
     summary: text,
@@ -336,15 +351,9 @@ export function repairReportSummary(
     riskFlags,
     healthScore: score,
     contextualInsights,
-    foodRecommendations: sanitizeRecommendationLines(
-      summary.foodRecommendations,
-      structured
-    ),
-    exerciseRecommendations: sanitizeRecommendationLines(
-      summary.exerciseRecommendations,
-      structured
-    ),
-    lifestyleAdvice: sanitizeRecommendationLines(summary.lifestyleAdvice, structured),
+    foodRecommendations: limited.foodRecommendations,
+    exerciseRecommendations: limited.exerciseRecommendations,
+    lifestyleAdvice: limited.lifestyleAdvice,
     ...(factors.length ? { _scoreFactors: factors } : {}),
   } as MedicalSummaryResult & { _scoreFactors?: typeof factors };
 }

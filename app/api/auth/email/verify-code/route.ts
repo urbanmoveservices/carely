@@ -66,6 +66,9 @@ export async function POST(req: NextRequest) {
       metadata: { delivery: "otp" },
     });
 
+    const { onEmailVerified } = await import("@/lib/email/automation-triggers");
+    void onEmailVerified(user.id);
+
     return ok({
       success: true,
       message: "Email verified.",

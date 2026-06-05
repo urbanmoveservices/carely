@@ -666,6 +666,47 @@ async function sectionAuth() {
   skip("logout_api", "No API logout endpoint");
 
   await sectionEmailOtp();
+  await sectionEmailSystem();
+}
+
+async function sectionEmailSystem() {
+  try {
+    const { sanitizeEmailSubject, isSubjectHealthSafe } = await import("../lib/email/privacy");
+    const { renderBrandedTemplate } = await import("../lib/email/templates-branded");
+    const bad = sanitizeEmailSubject("TSH high LDL diabetes alert");
+    isSubjectHealthSafe(bad) ? pass("email_subject_health_safe") : fail("email_subject_health_safe");
+    const tpl = renderBrandedTemplate("ai_summary_ready", {
+      name: "Test",
+      reportLink: "https://example.com/r/1",
+    });
+    /\b(tsh|ldl|diabetes|high)\b/i.test(tpl.subject)
+      ? fail("email_summary_subject_no_markers")
+      : pass("email_summary_subject_no_markers");
+
+    if (process.env.E2E_ALLOW_TEST_HELPERS === "true" && state.sessionA?.email) {
+      const prefs = await apiFetch("/api/email/preferences", {}, state.sessionA);
+      prefs.status === 200 ? pass("email_preferences_get") : fail("email_preferences_get");
+      const patch = await apiFetch(
+        "/api/email/preferences",
+        {
+          method: "PATCH",
+          body: JSON.stringify({ marketingEnabled: false, newsletterEnabled: false }),
+        },
+        state.sessionA
+      );
+      patch.status === 200 ? pass("email_preferences_update") : fail("email_preferences_update");
+      const logs = await apiFetch(
+        `/api/test/email-logs?email=${encodeURIComponent(state.sessionA.email)}`
+      );
+      logs.status === 200 ? pass("email_test_logs_endpoint") : fail("email_test_logs_endpoint");
+    } else {
+      skip("email_preferences_get", "no session");
+      skip("email_preferences_update", "no session");
+      skip("email_test_logs_endpoint", "helpers off");
+    }
+  } catch (e) {
+    fail("email_system_section", e instanceof Error ? e.message : "error");
+  }
 }
 
 async function fetchLatestOtp(email: string, type: string): Promise<string | null> {
@@ -716,15 +757,6 @@ async function sectionEmailOtp() {
     ? pass("email_otp_wrong_code")
     : fail("email_otp_wrong_code", `status ${bad.status} code ${bad.data.code}`);
 
-  const good = await apiFetch(
-    "/api/auth/email/verify-code",
-    { method: "POST", body: JSON.stringify({ code: otp }) },
-    state.sessionA
-  );
-  good.status === 200
-    ? pass("email_otp_verify_success")
-    : fail("email_otp_verify_success", `status ${good.status}`);
-
   const send1 = await apiFetch(
     "/api/auth/email/send-code",
     { method: "POST", body: JSON.stringify({}) },
@@ -738,6 +770,21 @@ async function sectionEmailOtp() {
   send2.status === 429 || send2.data.code === "OTP_RESEND_COOLDOWN"
     ? pass("email_otp_resend_cooldown")
     : fail("email_otp_resend_cooldown", `status ${send2.status}`);
+
+  let verifyOtp = otp;
+  if (send1.status === 200 && send1.data.success) {
+    const refreshed = await fetchLatestOtp(state.emailA, "email_verification");
+    if (refreshed) verifyOtp = refreshed;
+  }
+
+  const good = await apiFetch(
+    "/api/auth/email/verify-code",
+    { method: "POST", body: JSON.stringify({ code: verifyOtp }) },
+    state.sessionA
+  );
+  good.status === 200
+    ? pass("email_otp_verify_success")
+    : fail("email_otp_verify_success", `status ${good.status}`);
 
   const unknownForgot = await apiFetch("/api/auth/password/forgot", {
     method: "POST",
@@ -1394,6 +1441,69 @@ async function sectionStructuredLabParser() {
       : fail("structured_summary_repair_injects_tsh");
   } catch (e) {
     fail("structured_lab_parser_fixture", e instanceof Error ? e.message : "error");
+  }
+}
+
+async function sectionAiOptimization() {
+  try {
+    const { buildCompactReportContext } = await import("../lib/ai/compact-report-context");
+    const { ensureRecommendationCounts, RECOMMENDATION_MAX, RECOMMENDATION_MIN } = await import(
+      "../lib/ai/recommendation-limits"
+    );
+    const { formatWeatherForPrompt } = await import("../lib/weather/weather-context");
+    const { selectChatHistory } = await import("../lib/ai/chat-thread-compression");
+    const { parseLabValuesFromText } = await import("../lib/lab-value-parser");
+    const fp = path.join(process.cwd(), "test-fixtures/download-digital-report-text.txt");
+    const text = await readFile(fp, "utf8");
+    const structured = parseLabValuesFromText(text);
+    const compact = await buildCompactReportContext({
+      userId: "e2e-user",
+      extractedText: text,
+      healthContext: { skipped: true, questionnaire: {}, familyProfile: null },
+      structuredLabValues: structured,
+    });
+    if (structured.length >= 3 && compact.promptText.includes(text.slice(0, 400))) {
+      fail("compact_context_no_full_text");
+    } else {
+      pass("compact_context_no_full_text");
+    }
+    compact.promptText.includes("STRUCTURED LAB VALUES")
+      ? pass("compact_context_has_structured_block")
+      : fail("compact_context_has_structured_block");
+    /do not invent/i.test(formatWeatherForPrompt(null))
+      ? pass("weather_no_invent")
+      : fail("weather_no_invent");
+    const limited = ensureRecommendationCounts(
+      Array.from({ length: 10 }, () => "Eat dal and roti with sabzi"),
+      Array.from({ length: 10 }, () => "Walk 30 minutes"),
+      Array.from({ length: 10 }, () => "Sleep 7 hours"),
+      structured
+    );
+    limited.foodRecommendations.length <= RECOMMENDATION_MAX
+      ? pass("food_max_7")
+      : fail("food_max_7");
+    limited.foodRecommendations.length >= RECOMMENDATION_MIN &&
+    limited.exerciseRecommendations.length >= RECOMMENDATION_MIN &&
+    limited.lifestyleAdvice.length >= RECOMMENDATION_MIN
+      ? pass("recommendations_min_5")
+      : fail("recommendations_min_5");
+    limited.foodRecommendations.some((l) => /\b(dal|roti|sabzi)\b/i.test(l))
+      ? pass("indian_diet_examples")
+      : fail("indian_diet_examples");
+    const hist = selectChatHistory({
+      summary: "Earlier TSH discussion",
+      messages: Array.from({ length: 8 }, (_, i) => ({
+        role: i % 2 ? "assistant" : "user",
+        content: `m${i}`,
+      })),
+    });
+    hist.recent.length === 4 ? pass("chat_history_last_4") : fail("chat_history_last_4");
+    hist.summary ? pass("chat_history_uses_summary") : fail("chat_history_uses_summary");
+    process.env.AI_DEBUG_CONTEXT = "false";
+    const { shouldAttachDebugStats } = await import("../lib/ai/compact-report-context");
+    !shouldAttachDebugStats() ? pass("debug_stats_prod_blocked") : fail("debug_stats_prod_blocked");
+  } catch (e) {
+    fail("ai_optimization_section", e instanceof Error ? e.message : "error");
   }
 }
 
@@ -2390,6 +2500,7 @@ async function main(): Promise<number> {
   await sectionUpload();
   await sectionProMultiUpload();
   await sectionStructuredLabParser();
+  await sectionAiOptimization();
   await sectionAiSummary();
   await sectionHealthRisks();
   await sectionReminders();

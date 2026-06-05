@@ -2,6 +2,10 @@ import prisma from "@/lib/prisma";
 import { computeAge } from "@/lib/profile";
 import { resolveReportForUser } from "@/lib/report-resolve";
 import { buildContextDigest, extractLabsFromContext, medicineHintsForLabs } from "@/lib/ai/chat-context-digest";
+import { loadStructuredLabValues } from "@/lib/lab-value-service";
+import { formatStructuredValuesForPrompt } from "@/lib/lab-value-parser";
+import { isCompactContextOnly } from "@/lib/ai/model-router";
+import { selectRelevantSnippets } from "@/lib/ai/relevant-snippet-selector";
 
 export type ChatSourceRef = {
   type: "report" | "family" | "document" | "risk" | "reminder";
@@ -71,6 +75,22 @@ export async function buildReportChatContext(userId: string, reportId: string) {
     },
   ];
 
+  const structuredLabValues = await loadStructuredLabValues({
+    userId,
+    documentId: report.documentId,
+    reportId: report.id,
+    extractedText: document?.extractedText ?? "",
+    reparseIfEmpty: false,
+  });
+
+  const compactOnly = isCompactContextOnly() && structuredLabValues.length >= 3;
+  const extractedPreview = compactOnly
+    ? selectRelevantSnippets(
+        document?.extractedText ?? "",
+        structuredLabValues.map((v) => v.testName)
+      ) || null
+    : document?.extractedText?.slice(0, 2500) ?? null;
+
   const reportPayload = {
     id: report.id,
     filename: document?.originalFilename,
@@ -95,7 +115,10 @@ export async function buildReportChatContext(userId: string, reportId: string) {
       : null,
     activeMedications: reportMedications,
     familyMember: document?.familyMember,
-    extractedPreview: document?.extractedText?.slice(0, 2500) ?? null,
+    extractedPreview,
+    structuredLabBlock: structuredLabValues.length
+      ? formatStructuredValuesForPrompt(structuredLabValues)
+      : null,
   };
 
   const labs = extractLabsFromContext({ report: reportPayload });
@@ -107,6 +130,8 @@ export async function buildReportChatContext(userId: string, reportId: string) {
     contextDigest: buildContextDigest({ report: reportPayload }),
     medicineHints: medHints || null,
     report: reportPayload,
+    structuredLabValues,
+    compactContext: compactOnly,
   };
 }
 

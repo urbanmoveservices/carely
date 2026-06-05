@@ -193,6 +193,10 @@ export async function getSystemHealth() {
       ok: isEmailConfigured(),
       fromDomain: getSmtpFromDomain(),
       failedLogCount: Math.max(0, failedEmailLogs),
+      dnsNote:
+        "Configure SPF, DKIM, and DMARC for support@vaidya-gpt.com before high-volume marketing sends.",
+      marketingEnabled: process.env.EMAIL_MARKETING_ENABLED === "true",
+      automationEnabled: process.env.EMAIL_AUTOMATION_ENABLED !== "false",
     },
     push: {
       configured: isPushConfigured(),

@@ -55,6 +55,15 @@ export async function POST(req: NextRequest) {
         }
       );
 
+      if (!result.alreadyVerified) {
+        const { onPaymentSuccess } = await import("@/lib/email/automation-triggers");
+        void onPaymentSuccess(
+          auth.payload.userId,
+          PLAN_LIMITS[result.plan].name,
+          undefined
+        );
+      }
+
       const limits = PLAN_LIMITS[result.plan];
       return ok({
         success: true,

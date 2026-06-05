@@ -238,7 +238,11 @@ export async function POST(
 
       });
 
-
+      const { onReportUploaded, onReportAwaitingSummary } = await import(
+        "@/lib/email/automation-triggers"
+      );
+      void onReportUploaded(payload.userId, doc.originalFilename);
+      void onReportAwaitingSummary(payload.userId, id);
 
       const full = await prisma.document.findUnique({
 

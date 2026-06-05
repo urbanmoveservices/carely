@@ -67,6 +67,9 @@ export const RATE_LIMITS = {
   CHAT_BURST:       { limit: 20,  windowMs: 10 * 60 * 1000 },
   /** Per-user hourly cap on AI chat asks (abuse protection). */
   CHAT_HOURLY:      { limit: 60,  windowMs: 60 * 60 * 1000 },
+  EMAIL_UNSUBSCRIBE: { limit: 20, windowMs: 10 * 60 * 1000 },
+  EMAIL_PREFERENCES: { limit: 30, windowMs: 10 * 60 * 1000 },
+  EMAIL_CAMPAIGN_TEST: { limit: 10, windowMs: 60 * 60 * 1000 },
 } as const;
 
 export function checkRateLimit(

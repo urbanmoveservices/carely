@@ -256,6 +256,22 @@ function SettingsContent() {
           </div>
 
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email preferences
+            </h2>
+            <p className="text-sm text-gray-600 mb-3">
+              Report, reminder, marketing, and newsletter emails. Security emails are always sent when
+              required.
+            </p>
+            <Link href="/settings/email-preferences">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                Manage email preferences
+              </Button>
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <h2 className="text-sm font-semibold text-gray-900 mb-3">Email verification</h2>
             <p className="text-sm text-gray-600 mb-3">
               Status:{" "}

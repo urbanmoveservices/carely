@@ -11,10 +11,12 @@ import {
   buildGeneralChatContext,
   buildFamilyChatContext,
   buildReportChatContext,
+  type ChatSourceRef,
 } from "@/lib/ai/chat-context-builder";
 import {
   answerUserHealthQuestion,
   AiChatNotConfiguredError,
+  type DirectChatResult,
 } from "@/lib/ai/direct-chat";
 import {
   appendChatMessages,
@@ -36,6 +38,20 @@ import {
   isNutritionQuestion,
   runNutritionToolsForMessage,
 } from "@/lib/nutrition/chat-tools";
+import { tryLocalAnswer } from "@/lib/ai/local-answer-engine";
+import {
+  buildResponseCacheHash,
+  getCachedResponse,
+  setCachedResponse,
+} from "@/lib/ai/context-cache";
+import { hashInput, logAiUsage } from "@/lib/ai/token-usage";
+import {
+  maybeCompressChatThread,
+  selectChatHistory,
+} from "@/lib/ai/chat-thread-compression";
+import { classifyChatSafety } from "@/lib/ai/chat-safety";
+import { getModelForFeature } from "@/lib/ai/model-router";
+import { shouldAttachDebugStats } from "@/lib/ai/compact-report-context";
 
 export type ChatAskMode = "general" | "report" | "family";
 
@@ -69,6 +85,14 @@ export type ChatAskOutput = {
   safetyLevel: "normal" | "caution" | "urgent";
   suggestedQuestions: string[];
   assistantMessageId?: string;
+  debugContextStats?: {
+    contextType: string;
+    estimatedInputTokens: number;
+    rawTextCharsSent: number;
+    structuredValuesSent: number;
+    cacheHit: boolean;
+  };
+  answerSource?: "local" | "cache" | "openai";
 };
 
 export class ChatRateLimitedError extends Error {
@@ -252,28 +276,124 @@ export async function askChat(input: ChatAskInput): Promise<ChatAskOutput> {
     });
   }
 
-  const history = thread.messages
-    .filter((m: { role: string; content: string }) => m.role === "user" || m.role === "assistant")
-    .filter((m: { id: string }) => m.id !== input.retryOfMessageId)
-    .map((m: { role: string; content: string }) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
-    }));
+  const threadSummary = await maybeCompressChatThread({
+    threadId: thread.id,
+    userId: input.userId,
+    messageCount: thread.messages.length,
+  });
 
-  let result;
-  try {
-    result = await answerUserHealthQuestion({
-      message: input.message,
-      mode: input.mode,
-      context,
-      language: langCode,
-      history,
+  const { recent: history } = selectChatHistory({
+    summary: threadSummary ?? thread.summary,
+    messages: thread.messages
+      .filter((m: { id: string }) => m.id !== input.retryOfMessageId)
+      .map((m: { role: string; content: string }) => ({
+        role: m.role,
+        content: m.content,
+      })),
+  });
+
+  const safety = classifyChatSafety(input.message, langCode === "hi" ? "hi" : "en");
+  const contextHash = hashInput([
+    JSON.stringify(context?.report ?? {}),
+    context?.compactContext ? "compact" : "full",
+    context?.structuredLabValues ? "structured" : "none",
+  ]);
+  const cacheType = `chat_${input.mode}`;
+  const inputHash = buildResponseCacheHash({
+    userId: input.userId,
+    feature: cacheType,
+    reportId: input.reportId,
+    question: input.message,
+    contextHash,
+    language: langCode === "hi" ? "hi" : "en",
+    model: getModelForFeature("chat"),
+  });
+
+  let result: DirectChatResult | undefined;
+  let answerSource: ChatAskOutput["answerSource"] = "openai";
+  let debugContextStats: ChatAskOutput["debugContextStats"];
+
+  const local = await tryLocalAnswer({
+    userId: input.userId,
+    message: input.message,
+    language: langCode === "hi" ? "hi" : "en",
+    reportId: input.reportId,
+    context: context ?? undefined,
+  });
+
+  if (local?.confidence === "high") {
+    result = {
+      answer: local.answer,
+      safetyLevel: safety.isEmergency ? "urgent" : "normal",
+      sources: (context?.sources as ChatSourceRef[] | undefined) ?? [],
+      suggestedQuestions: [],
+    };
+    answerSource = "local";
+    await logAiUsage({
+      userId: input.userId,
+      feature: local.feature,
+      source: "local",
+      cached: false,
+      reportId: input.reportId,
     });
-  } catch (err) {
-    if (err instanceof AiChatNotConfiguredError || err instanceof AiChatServiceError) {
-      throw err;
+  } else if (!safety.isEmergency && !isRetry) {
+    const cached = await getCachedResponse<DirectChatResult>({
+      userId: input.userId,
+      type: cacheType,
+      inputHash,
+    });
+    if (cached) {
+      result = cached;
+      answerSource = "cache";
+      await logAiUsage({
+        userId: input.userId,
+        feature: cacheType,
+        source: "cache",
+        cached: true,
+        reportId: input.reportId,
+      });
+      if (shouldAttachDebugStats()) {
+        debugContextStats = {
+          contextType: "compact",
+          estimatedInputTokens: 0,
+          rawTextCharsSent: 0,
+          structuredValuesSent: Array.isArray(context?.structuredLabValues)
+            ? (context.structuredLabValues as unknown[]).length
+            : 0,
+          cacheHit: true,
+        };
+      }
     }
-    throw new AiChatServiceError();
+  }
+
+  if (!result) {
+    try {
+      result = await answerUserHealthQuestion({
+        message: input.message,
+        mode: input.mode,
+        context,
+        language: langCode === "hi" ? "hi" : "en",
+        history,
+        threadSummary: threadSummary ?? thread.summary,
+        userId: input.userId,
+        reportId: input.reportId,
+      });
+      if (!safety.isEmergency) {
+        await setCachedResponse({
+          userId: input.userId,
+          type: cacheType,
+          inputHash,
+          output: result,
+          model: getModelForFeature("chat"),
+          ttlHours: 24,
+        });
+      }
+    } catch (err) {
+      if (err instanceof AiChatNotConfiguredError || err instanceof AiChatServiceError) {
+        throw err;
+      }
+      throw new AiChatServiceError();
+    }
   }
 
   const sources = enrichChatSources(
@@ -292,6 +412,8 @@ export async function askChat(input: ChatAskInput): Promise<ChatAskOutput> {
     safetyLevel: result.safetyLevel,
     suggestedQuestions: result.suggestedQuestions,
     status: "ok",
+    answerSource,
+    ...(debugContextStats ? { debugContextStats } : {}),
   };
 
   let assistantMessageId: string | undefined;
@@ -330,6 +452,8 @@ export async function askChat(input: ChatAskInput): Promise<ChatAskOutput> {
     safetyLevel: result.safetyLevel,
     suggestedQuestions: result.suggestedQuestions,
     assistantMessageId,
+    answerSource,
+    ...(debugContextStats ? { debugContextStats } : {}),
   };
 }
 

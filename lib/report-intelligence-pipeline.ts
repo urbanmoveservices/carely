@@ -61,6 +61,8 @@ export async function runReportIntelligencePipeline(params: {
 
   const { result: rawResult, model, durationMs: aiMs } = await generateMedicalSummary({
     documentId: params.documentId,
+    userId: params.userId,
+    reportId: params.reportId,
     extractedText: params.extractedText,
     originalFilename: params.originalFilename,
     uploadMode: params.uploadMode,

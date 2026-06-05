@@ -89,6 +89,12 @@ model User {
   supportTickets        SupportTicket[]
   accessLogs            AccessLog[]
   errorLogs             ErrorLog[]
+  aiContextCaches       AiContextCache[]
+  aiResponseCaches      AiResponseCache[]
+  aiUsageLogs           AiUsageLog[]
+  emailPreference       EmailPreference?
+  emailAutomationEvents EmailAutomationEvent[]
+  emailCampaignRecipients EmailCampaignRecipient[]
 }
 
 model UsageCounter {
@@ -975,23 +981,84 @@ model ManualLabValue {
 }
 
 model ChatThread {
-  id             String        @id @default(cuid())
-  userId         String
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reportId       String?
-  report         Report?       @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  familyMemberId String?
-  familyMember   FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
-  type           String        @default("general")
-  title          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  messages       ChatMessage[]
+  id                   String        @id @default(cuid())
+  userId               String
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId             String?
+  report               Report?       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  familyMemberId       String?
+  familyMember         FamilyMember? @relation(fields: [familyMemberId], references: [id], onDelete: SetNull)
+  type                 String        @default("general")
+  title                String?
+  summary              String?       @db.Text
+  summaryUpdatedAt     DateTime?
+  messageCountAtSummary Int?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  messages             ChatMessage[]
 
   @@index([userId])
   @@index([reportId])
   @@index([familyMemberId])
   @@index([type])
+}
+
+model AiContextCache {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId   String?
+  reportId     String?
+  type         String
+  sourceHash   String
+  contextJson  Json
+  tokenEstimate Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, type, sourceHash])
+  @@index([userId])
+  @@index([documentId])
+  @@index([reportId])
+}
+
+model AiResponseCache {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String
+  inputHash   String
+  outputJson  Json
+  model       String?
+  tokensSaved Int?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, type, inputHash])
+  @@index([userId])
+  @@index([type])
+  @@index([expiresAt])
+}
+
+model AiUsageLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  feature      String
+  model        String?
+  inputTokens  Int?
+  outputTokens Int?
+  totalTokens  Int?
+  cached       Boolean  @default(false)
+  source       String   @default("openai")
+  reportId     String?
+  documentId   String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([feature])
+  @@index([createdAt])
+  @@index([cached])
 }
 
 model ChatMessage {
@@ -1039,22 +1106,119 @@ model AccountDeletionRequest {
 }
 
 model EmailLog {
-  id        String    @id @default(cuid())
-  userId    String?
-  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  to        String
-  subject   String
-  type      String
-  status    String    @default("queued")
-  error     String?
-  metadata  Json?
-  createdAt DateTime  @default(now())
-  sentAt    DateTime?
+  id                String    @id @default(cuid())
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  to                String
+  fromEmail         String?
+  subject           String
+  type              String
+  category          String?
+  templateKey       String?
+  status            String    @default("queued")
+  providerMessageId String?
+  error             String?
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  sentAt            DateTime?
 
   @@index([userId])
   @@index([to])
   @@index([type])
+  @@index([templateKey])
+  @@index([category])
   @@index([status])
+  @@index([createdAt])
+}
+
+model EmailPreference {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionalEnabled  Boolean   @default(true)
+  lifecycleEnabled      Boolean   @default(true)
+  marketingEnabled      Boolean   @default(false)
+  newsletterEnabled     Boolean   @default(false)
+  productUpdatesEnabled Boolean   @default(false)
+  reminderEmailsEnabled Boolean   @default(true)
+  reportEmailsEnabled     Boolean   @default(true)
+  billingEmailsEnabled    Boolean   @default(true)
+  unsubscribedAt        DateTime?
+  unsubscribeReason     String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model EmailCampaign {
+  id           String   @id @default(cuid())
+  name         String
+  subject      String
+  previewText  String?
+  templateKey  String
+  category     String
+  status       String   @default("draft")
+  segment      Json?
+  contentJson  Json?
+  scheduledAt  DateTime?
+  sentAt       DateTime?
+  createdById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  recipients   EmailCampaignRecipient[]
+
+  @@index([status])
+  @@index([category])
+  @@index([scheduledAt])
+}
+
+model EmailCampaignRecipient {
+  id         String        @id @default(cuid())
+  campaignId String
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email      String
+  status     String        @default("pending")
+  sentAt     DateTime?
+  error      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([campaignId])
+  @@index([userId])
+  @@index([email])
+  @@index([status])
+}
+
+model EmailUnsubscribeToken {
+  id         String    @id @default(cuid())
+  userId     String?
+  email      String
+  tokenHash  String    @unique
+  category   String?
+  expiresAt  DateTime?
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email])
+  @@index([userId])
+}
+
+model EmailAutomationEvent {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType   String
+  payload     Json?
+  processed   Boolean   @default(false)
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([processed])
+  @@index([createdAt])
 }
 
 model PushSubscription {

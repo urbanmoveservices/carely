@@ -157,13 +157,32 @@ async function main(): Promise<number> {
   }
 
   // --- Warnings (grouped — one line each) ---
+  const emailOk = isEmailConfigured();
   push(
     checks,
     "email",
     "warning",
-    isEmailConfigured(),
-    isEmailConfigured() ? undefined : "SMTP not configured"
+    emailOk,
+    emailOk ? undefined : "SMTP not configured"
   );
+
+  if (emailOk) {
+    const supportEmail = process.env.SUPPORT_EMAIL?.trim();
+    push(
+      checks,
+      "email_support_address",
+      "info",
+      Boolean(supportEmail),
+      supportEmail ? undefined : "SUPPORT_EMAIL not set (recommended)"
+    );
+    push(
+      checks,
+      "email_dns_spf_dkim_dmarc",
+      "warning",
+      false,
+      `Configure SPF, DKIM, and DMARC for ${supportEmail || process.env.SMTP_FROM || "your sender domain"}`
+    );
+  }
 
   push(
     checks,

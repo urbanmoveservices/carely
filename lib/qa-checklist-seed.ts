@@ -114,6 +114,15 @@ export const QA_CHECKLIST_ITEMS: QaSeedItem[] = [
   item("ai_summary", "risk_dedupe_universal", "Risk dedupe universal", "Liver enzyme group; no duplicate marker cards"),
   item("ai_summary", "reports_repair_script", "Repair existing reports", "npm run reports:repair-values"),
   item("ai_summary", "report_context_separated", "Report vs user context", "Uploaded report vs questionnaire wording separated"),
+  item("ai_summary", "ai_token_optimization", "Token optimization layer", "Compact context, cache, local answers, usage logging"),
+  item("ai_summary", "ai_compact_context", "Compact report context", "Structured lab values sent; not full extractedText by default"),
+  item("ai_summary", "ai_response_cache", "AI response cache", "Same report question uses cached response"),
+  item("ai_summary", "ai_local_answer_engine", "Local answer engine", "IFCT nutrition and lab lookups without OpenAI"),
+  item("ai_summary", "recommendations_5_7_limit", "Food/exercise/lifestyle 5–7", "Each section trimmed to 5–7 high-quality points"),
+  item("ai_summary", "indian_diet_recommendations", "Indian diet aware", "Roti, dal, sabzi examples; not generic western-only"),
+  item("ai_summary", "weather_location_recommendations", "Weather/location aware", "Exercise adapts when context exists; no invented weather"),
+  item("ai_summary", "ai_usage_logging", "AI usage logging", "AiUsageLog records tokens, cache, and local answers"),
+  item("admin", "admin_ai_usage_page", "Admin AI usage dashboard", "/admin/ai-usage shows token stats"),
 
   // Report
   item("report", "report_summary", "Summary visible", "Report page shows summary"),

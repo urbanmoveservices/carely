@@ -58,3 +58,21 @@ export function hasLabTrendRecordDelegate(): boolean {
 export function hasFamilyTimelineEventDelegate(): boolean {
   return hasPrismaDelegate("familyTimelineEvent");
 }
+
+export function hasAiUsageLogDelegate(): boolean {
+  const delegate = (prisma as unknown as Record<string, unknown>).aiUsageLog;
+  return (
+    delegate != null &&
+    typeof delegate === "object" &&
+    typeof (delegate as { create?: unknown }).create === "function"
+  );
+}
+
+export function hasAiResponseCacheDelegate(): boolean {
+  const delegate = (prisma as unknown as Record<string, unknown>).aiResponseCache;
+  return (
+    delegate != null &&
+    typeof delegate === "object" &&
+    typeof (delegate as { findUnique?: unknown }).findUnique === "function"
+  );
+}

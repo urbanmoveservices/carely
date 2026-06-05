@@ -221,6 +221,9 @@ export async function POST(
         }
       );
 
+      const { onAiSummaryReady } = await import("@/lib/email/automation-triggers");
+      void onAiSummaryReady(payload.userId, report.id);
+
       return ok({
         report_id: report.id,
         document_id: document.id,
@@ -246,6 +249,8 @@ export async function POST(
         entityId: document.id,
         metadata: { errorCode: code },
       });
+      const { onAiSummaryFailed } = await import("@/lib/email/automation-triggers");
+      void onAiSummaryFailed(payload.userId, document.id, code);
       throw aiErr;
     }
   } catch (err: unknown) {

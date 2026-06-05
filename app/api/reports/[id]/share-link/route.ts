@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/family-auth";
 import { forbidden, notFound, serverError, validationError } from "@/lib/api-response";
 import { generateSecureToken } from "@/lib/secure-token";
-import { getBaseUrlFromRequest } from "@/lib/app-url";
+import { absoluteUrl, getBaseUrlFromRequest } from "@/lib/app-url";
 import { resolveReportForUser } from "@/lib/report-resolve";
 import { auditUserAction, AUDIT_ACTIONS } from "@/lib/audit-log";
 
@@ -53,6 +53,12 @@ export async function POST(
       entityId: link.id,
       metadata: { reportId, expiresInDays: parsed.data.expiresInDays },
     });
+
+    const { onDoctorShareCreated } = await import("@/lib/email/automation-triggers");
+    void onDoctorShareCreated(
+      auth.payload.userId,
+      absoluteUrl(`/share/report/${token}`)
+    );
 
     return NextResponse.json({
       shareUrl: `${getBaseUrlFromRequest(req)}/share/report/${token}`,

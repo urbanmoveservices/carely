@@ -3,6 +3,8 @@ import type { ChatSourceRef } from "@/lib/ai/chat-context-builder";
 import { AiChatServiceError, isOpenAiTransientError } from "@/lib/ai/chat-errors-ai";
 import { buildChatSystemPrompt } from "@/lib/ai/chat-prompt-builder";
 import { getChatSuggestions } from "@/lib/chat/suggested-questions";
+import { getModelForFeature, getMaxOutputTokens } from "@/lib/ai/model-router";
+import { logAiUsage } from "@/lib/ai/token-usage";
 
 export type DirectChatResult = {
   answer: string;
@@ -145,6 +147,10 @@ export async function answerUserHealthQuestion(params: {
   context: Record<string, unknown>;
   language: string;
   history?: Array<{ role: "user" | "assistant"; content: string }>;
+  threadSummary?: string | null;
+  userId?: string;
+  reportId?: string | null;
+  documentId?: string | null;
 }): Promise<DirectChatResult> {
   if (!isOpenAiChatConfigured()) {
     throw new AiChatNotConfiguredError();
@@ -170,17 +176,25 @@ export async function answerUserHealthQuestion(params: {
     { role: "system", content: system },
   ];
 
-  for (const h of (params.history ?? []).slice(-10)) {
+  if (params.threadSummary?.trim()) {
+    messages.push({
+      role: "system",
+      content: `Earlier conversation summary:\n${params.threadSummary.slice(0, 2000)}`,
+    });
+  }
+
+  for (const h of (params.history ?? []).slice(-4)) {
     messages.push({ role: h.role, content: h.content.slice(0, 2500) });
   }
   messages.push({ role: "user", content: params.message.slice(0, 2000) });
 
+  const model = getModelForFeature("chat");
   let response;
   try {
     response = await client.chat.completions.create({
-      model: getOpenAiChatModel(),
+      model,
       temperature: 0.25,
-      max_tokens: 1600,
+      max_tokens: getMaxOutputTokens("chat"),
       response_format: { type: "json_object" },
       messages,
     });
@@ -190,6 +204,17 @@ export async function answerUserHealthQuestion(params: {
     }
     throw new AiChatServiceError(generationFailedMessage(lang));
   }
+
+  await logAiUsage({
+    userId: params.userId,
+    feature: "chat",
+    model,
+    inputTokens: response.usage?.prompt_tokens,
+    outputTokens: response.usage?.completion_tokens,
+    source: "openai",
+    reportId: params.reportId,
+    documentId: params.documentId,
+  });
 
   const raw = response.choices[0]?.message?.content?.trim() || "";
   const result = parseJsonResponse(raw, fallbackSources, params.mode, lang);

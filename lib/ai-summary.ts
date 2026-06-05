@@ -6,10 +6,10 @@ import {
 } from "@/lib/summary-error-messages";
 import { getAiLanguageInstruction } from "@/lib/i18n/ai-language";
 import type { AiHealthContextBundle } from "@/lib/report-context-service";
-import {
-  formatStructuredValuesForPrompt,
-  type ParsedLabValue,
-} from "@/lib/lab-value-parser";
+import type { ParsedLabValue } from "@/lib/lab-value-parser";
+import { buildCompactReportContext } from "@/lib/ai/compact-report-context";
+import { getModelForFeature, getMaxOutputTokens } from "@/lib/ai/model-router";
+import { logAiUsage } from "@/lib/ai/token-usage";
 
 export interface KeyFinding {
   title: string;
@@ -61,6 +61,8 @@ export interface MedicalSummaryResult {
 
 interface GenerateParams {
   documentId: string;
+  userId: string;
+  reportId?: string | null;
   extractedText: string;
   originalFilename: string;
   uploadMode?: string | null;
@@ -70,7 +72,15 @@ interface GenerateParams {
   structuredLabValues?: ParsedLabValue[];
 }
 
-const MAX_TEXT_LENGTH = 16000;
+export type SummaryDebugMeta = {
+  debugContextStats?: {
+    contextType: string;
+    estimatedInputTokens: number;
+    rawTextCharsSent: number;
+    structuredValuesSent: number;
+    cacheHit: boolean;
+  };
+};
 
 const CONTEXT_RULES = `
 You are a clinical medical report analyst. Provide full diagnostic interpretation and treatment guidance based on the extracted report text and user health context.
@@ -100,24 +110,19 @@ STRUCTURED LAB VALUES (when provided in the user message):
 
 COMPREHENSIVE ACTION PLANS (mandatory — avoid vague one-line tips):
 
-foodRecommendations: Return 10–14 strings. Each string must be a full, actionable sentence (not a 5-word bullet). Cover all sections that apply to THIS report's abnormal values and diagnoses:
-- Foods to eat more: name specific foods (e.g. leafy greens, dal, eggs, fatty fish, nuts, whole grains) with why they help their labs.
-- Foods to limit or avoid: name items and link to sugar, lipids, sodium, uric acid, liver, kidney, etc. from the report.
-- Meal timing and pattern: breakfast/lunch/dinner, spacing, fasting/non-fasting context, glycemic control if sugar markers abnormal.
-- Nutrients to prioritize: iron, B12, folate, vitamin D, protein, fiber, omega-3, potassium — only those relevant to findings.
-- Hydration and drinks: water intake, limit sugary drinks/alcohol if context or labs suggest it.
-- Sample ideas: 2–3 concrete meal or snack examples for a typical day in India-friendly and universal options.
-Every item must reference their actual report findings (e.g. low Hb → iron-rich foods; high LDL → soluble fiber and limit fried foods).
+foodRecommendations: Return exactly 5–7 strings only. Each must be practical and specific to THIS report's abnormal values:
+- Use Indian diet examples: roti, rice, dal, sabzi, curd, paneer, eggs, fish, pulses, sprouts — avoid kale/quinoa unless user prefers western diet.
+- Link foods to labs (e.g. high LDL → dal, vegetables, oats/dalia, less fried snacks).
+- Include portion/hydration tips where relevant.
+- End with general diet education disclaimer — not a medical diet prescription.
 
-exerciseRecommendations: Return 8–12 strings with a practical weekly plan:
-- Aerobic activity: type (brisk walk, cycling, swimming), minutes per session, days per week, target heart rate or perceived exertion.
-- Strength, flexibility, and daily movement (steps, breaks from sitting) when appropriate.
-- Precautions from context (BP, heart, joints, anemia-related fatigue, pregnancy, recent illness).
-- 4–8 week progression (how to increase duration or intensity safely).
-- Activities to postpone until a doctor approves, if any.
-- How exercise supports their specific conditions (e.g. insulin sensitivity, lipids, mood, weight).
+exerciseRecommendations: Return exactly 5–7 strings only:
+- Consider activity level, age, symptoms (breathlessness/fatigue), and report risks.
+- Adapt to location/weather context when provided (hot → morning/evening walks; rain → indoor yoga; pollution → indoor activity).
+- Do not suggest unsafe high-intensity exercise if breathlessness/fatigue symptoms present.
+- No invented weather — use only provided weather block.
 
-lifestyleAdvice: Return 12–18 strings — the most detailed section:
+lifestyleAdvice: Return exactly 5–7 strings only — do not repeat Food/Exercise points:
 - Multiple lines starting with "Medication:" (drug/class, typical dose, when to take, duration, lab monitoring).
 - Multiple lines starting with "Treatment:" (follow-up tests, specialist, procedures, non-drug care).
 - Sleep: target hours, schedule, hygiene habits tied to stress or metabolic health.
@@ -153,64 +158,61 @@ function buildSystemPrompt(language?: string | null): string {
 }
 
 async function callOpenAI(
-  extractedText: string,
-  filename: string,
-  healthContext: AiHealthContextBundle,
-  language?: string | null,
-  uploadMode?: string | null,
-  pageCount?: number | null,
-  structuredLabValues?: ParsedLabValue[]
-): Promise<MedicalSummaryResult> {
+  params: GenerateParams
+): Promise<{ result: MedicalSummaryResult; model: string; usage?: { input: number; output: number } }> {
   const { default: OpenAI } = await import("openai");
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  const trimmedText = extractedText.slice(0, MAX_TEXT_LENGTH);
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const structuredLabValues = params.structuredLabValues ?? [];
+  const compact = await buildCompactReportContext({
+    userId: params.userId,
+    extractedText: params.extractedText,
+    healthContext: params.healthContext,
+    structuredLabValues,
+  });
 
-  const contextJson = JSON.stringify(healthContext, null, 2);
+  const model = getModelForFeature("summary");
+  const maxTokens = getMaxOutputTokens("summary");
 
   const response = await client.chat.completions.create({
     model,
     messages: [
-      { role: "system", content: buildSystemPrompt(language) },
+      { role: "system", content: buildSystemPrompt(params.language) },
       {
         role: "user",
         content: [
-          "Provide full clinical diagnosis and prescription recommendations supported by the report and context.",
-          "foodRecommendations, exerciseRecommendations, and lifestyleAdvice must be comprehensive, specific, and personalized — not short generic bullets.",
-          "Do not invent lab values not in the extracted text.",
+          "Provide full clinical diagnosis and prescription recommendations supported by structured lab values and context.",
+          "foodRecommendations, exerciseRecommendations, and lifestyleAdvice: exactly 5–7 items each — high quality, Indian-diet aware, no duplicates.",
+          "Use structured lab values as source of truth. Do not invent lab values or weather.",
           "Return JSON only.",
           "",
-          `Filename: ${filename}`,
-          uploadMode === "multi_image"
+          `Filename: ${params.originalFilename}`,
+          params.uploadMode === "multi_image"
             ? [
                 "",
-                "This report was uploaded as multiple image pages. Page markers (--- Page N: ...) are included.",
-                `Total pages: ${pageCount ?? "unknown"}. Use all pages together when interpreting the report.`,
+                "Multi-image upload. Page markers may be present.",
+                `Total pages: ${params.pageCount ?? "unknown"}.`,
               ].join("\n")
             : "",
           "",
-          structuredLabValues?.length
-            ? [
-                "",
-                "=== STRUCTURED REPORT VALUES (SOURCE OF TRUTH — use these exact numbers) ===",
-                formatStructuredValuesForPrompt(structuredLabValues),
-                "",
-                "STRICT: Do not output Unknown for any category above. Use specific test names in keyFindings and abnormalValues.",
-              ].join("\n")
-            : "",
-          "",
-          "=== EXTRACTED MEDICAL REPORT TEXT ===",
-          trimmedText,
-          "",
-          "=== USER HEALTH CONTEXT (questionnaire + family profile — not from uploaded report) ===",
-          contextJson,
+          compact.promptText,
         ].join("\n"),
       },
     ],
     temperature: 0.3,
-    max_tokens: 6000,
+    max_tokens: maxTokens,
     response_format: { type: "json_object" },
+  });
+
+  await logAiUsage({
+    userId: params.userId,
+    feature: "summary",
+    model,
+    inputTokens: response.usage?.prompt_tokens,
+    outputTokens: response.usage?.completion_tokens,
+    source: "openai",
+    reportId: params.reportId,
+    documentId: params.documentId,
   });
 
   const content = response.choices[0]?.message?.content;
@@ -229,7 +231,14 @@ async function callOpenAI(
 
   try {
     const parsed = JSON.parse(cleaned);
-    return normalizeSummary(parsed);
+    return {
+      result: normalizeSummary(parsed),
+      model,
+      usage: {
+        input: response.usage?.prompt_tokens ?? 0,
+        output: response.usage?.completion_tokens ?? 0,
+      },
+    };
   } catch {
     throw new AppError(
       "AI summary could not be generated from this report. Please try again.",
@@ -274,28 +283,30 @@ function normalizeSummary(raw: any): MedicalSummaryResult {
 
 export async function generateMedicalSummary(
   params: GenerateParams
-): Promise<{ result: MedicalSummaryResult; model: string; durationMs: number }> {
+): Promise<{ result: MedicalSummaryResult; model: string; durationMs: number } & SummaryDebugMeta> {
   const start = Date.now();
 
   assertOpenAiConfigured();
   assertExtractedTextReady(params.extractedText);
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-
   try {
-    const result = await callOpenAI(
-      params.extractedText,
-      params.originalFilename,
-      params.healthContext,
-      params.language,
-      params.uploadMode,
-      params.pageCount,
-      params.structuredLabValues
-    );
+    const { result, model } = await callOpenAI(params);
+    const compact = await buildCompactReportContext({
+      userId: params.userId,
+      extractedText: params.extractedText,
+      healthContext: params.healthContext,
+      structuredLabValues: params.structuredLabValues ?? [],
+    });
+    const debugMeta: SummaryDebugMeta = {};
+    if (process.env.AI_DEBUG_CONTEXT === "true" && process.env.NODE_ENV !== "production") {
+      const { buildDebugContextStats } = await import("@/lib/ai/compact-report-context");
+      debugMeta.debugContextStats = buildDebugContextStats(compact);
+    }
     return {
       result,
       model,
       durationMs: Date.now() - start,
+      ...debugMeta,
     };
   } catch (err) {
     if (err instanceof AppError) throw err;

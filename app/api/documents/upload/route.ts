@@ -315,6 +315,12 @@ export async function POST(req: NextRequest) {
         metadata: { textLength: result.text.length },
       });
 
+      const { onReportUploaded, onReportAwaitingSummary } = await import(
+        "@/lib/email/automation-triggers"
+      );
+      void onReportUploaded(payload.userId, file.name);
+      void onReportAwaitingSummary(payload.userId, document.id);
+
       const updated = await prisma.document.findUnique({
         where: { id: document.id },
         include: {

@@ -6,6 +6,11 @@ import {
   THYROID_CANONICAL,
   LIPID_CANONICAL,
 } from "@/lib/lab-test-aliases";
+import {
+  RECOMMENDATION_MAX,
+  RECOMMENDATION_MIN,
+} from "@/lib/ai/recommendation-limits";
+import { isWesternFoodExample } from "@/lib/diet/indian-diet-context";
 
 export type SummaryValidationIssue = {
   code: string;
@@ -132,6 +137,44 @@ export function validateReportSummary(
     }
   }
 
+  for (const [key, arr] of [
+    ["foodRecommendations", summary.foodRecommendations],
+    ["exerciseRecommendations", summary.exerciseRecommendations],
+    ["lifestyleAdvice", summary.lifestyleAdvice],
+  ] as const) {
+    if (arr.length > RECOMMENDATION_MAX) {
+      issues.push({
+        code: "RECOMMENDATION_TOO_LONG",
+        message: `${key} has ${arr.length} items (max ${RECOMMENDATION_MAX})`,
+      });
+    }
+    const unique = new Set(arr.map((s) => s.trim().toLowerCase()));
+    if (unique.size < arr.length) {
+      issues.push({ code: "RECOMMENDATION_DUPLICATE", message: `${key} has duplicate items` });
+    }
+  }
+
+  const foodBlob = summary.foodRecommendations.join(" ");
+  if (
+    foodBlob.length > 40 &&
+    !/\b(dal|roti|rice|sabzi|curd|paneer|chana|palak|methi|dalia)\b/i.test(foodBlob) &&
+    isWesternFoodExample(foodBlob)
+  ) {
+    issues.push({
+      code: "FOOD_NOT_INDIAN_AWARE",
+      message: "Food recommendations lack Indian diet examples",
+    });
+  }
+
+  if (/\b(currently raining|pollution is high today|temperature is \d)/i.test(
+    [...summary.exerciseRecommendations, ...summary.lifestyleAdvice].join(" ")
+  )) {
+    issues.push({
+      code: "INVENTED_WEATHER",
+      message: "Recommendations invent specific weather data",
+    });
+  }
+
   const hasUnknownFindings = issues.some((i) =>
     i.code.startsWith("UNKNOWN") || i.code.startsWith("GENERIC")
   );
@@ -141,4 +184,20 @@ export function validateReportSummary(
     issues,
     hasUnknownFindings,
   };
+}
+
+export function validateRecommendationCounts(
+  summary: Pick<
+    MedicalSummaryResult,
+    "foodRecommendations" | "exerciseRecommendations" | "lifestyleAdvice"
+  >
+): boolean {
+  return (
+    summary.foodRecommendations.length >= RECOMMENDATION_MIN &&
+    summary.foodRecommendations.length <= RECOMMENDATION_MAX &&
+    summary.exerciseRecommendations.length >= RECOMMENDATION_MIN &&
+    summary.exerciseRecommendations.length <= RECOMMENDATION_MAX &&
+    summary.lifestyleAdvice.length >= RECOMMENDATION_MIN &&
+    summary.lifestyleAdvice.length <= RECOMMENDATION_MAX
+  );
 }

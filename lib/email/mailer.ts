@@ -18,6 +18,8 @@ export async function sendEmailVerificationOtp(params: {
   const result = await sendEmail({
     to: params.to,
     type: "email_verification",
+    templateKey: "email_verification_otp",
+    category: "transactional",
     data: { code: params.code, name: params.name },
     userId: params.userId,
     subject,
@@ -45,6 +47,8 @@ export async function sendPasswordResetOtp(params: {
   const result = await sendEmail({
     to: params.to,
     type: "password_reset",
+    templateKey: "password_reset_otp",
+    category: "transactional",
     data: { code: params.code, name: params.name },
     userId: params.userId,
     subject,
