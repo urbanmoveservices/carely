@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -20,6 +20,15 @@ interface CleanupResult {
   deletedCount: number;
 }
 
+interface AdminCredentialsInfo {
+  configured: boolean;
+  source: "env" | "database";
+  name: string | null;
+  email: string | null;
+  envKeys: string[];
+  changeInstructions: string;
+}
+
 export default function AdminSettingsPage() {
   return (
     <AdminLayout>
@@ -33,6 +42,14 @@ function AdminSettingsContent({ user }: { user: User }) {
   const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(null);
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupError, setCleanupError] = useState<string | null>(null);
+  const [credentialsInfo, setCredentialsInfo] = useState<AdminCredentialsInfo | null>(null);
+
+  useEffect(() => {
+    adminApi
+      .get<AdminCredentialsInfo>("/api/admin/settings/credentials")
+      .then(setCredentialsInfo)
+      .catch(() => setCredentialsInfo(null));
+  }, []);
 
   const handleLogout = () => {
     removeAdminToken();
@@ -95,6 +112,53 @@ function AdminSettingsContent({ user }: { user: User }) {
 
         <Card>
           <CardHeader>
+            <CardTitle>Admin credentials (.env)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {credentialsInfo ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                  <span className="text-sm text-gray-600">Auth source</span>
+                  <Badge variant={credentialsInfo.configured ? "completed" : "warning"}>
+                    {credentialsInfo.configured ? "Environment" : "Database only"}
+                  </Badge>
+                </div>
+                {credentialsInfo.configured && (
+                  <>
+                    <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                      <span className="text-sm text-gray-600">ADMIN_EMAIL</span>
+                      <span className="text-sm font-mono text-gray-900">
+                        {credentialsInfo.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                      <span className="text-sm text-gray-600">ADMIN_NAME</span>
+                      <span className="text-sm text-gray-900">{credentialsInfo.name}</span>
+                    </div>
+                    <div className="rounded-lg border border-amber-100 bg-amber-50 p-3 text-sm text-amber-900">
+                      <p className="font-medium mb-1">Change admin login</p>
+                      <p className="text-amber-800">{credentialsInfo.changeInstructions}</p>
+                      <p className="text-xs text-amber-700 mt-2 font-mono">
+                        {credentialsInfo.envKeys.join(", ")}
+                      </p>
+                    </div>
+                  </>
+                )}
+                {!credentialsInfo.configured && (
+                  <Alert variant="warning">
+                    Set ADMIN_EMAIL and ADMIN_PASSWORD in .env to manage admin login from
+                    environment variables.
+                  </Alert>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Loading credential configuration…</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
             <CardTitle>App Configuration</CardTitle>
           </CardHeader>
           <CardContent>
@@ -105,10 +169,6 @@ function AdminSettingsContent({ user }: { user: User }) {
                   {process.env.NEXT_PUBLIC_APP_URL?.trim() ||
                     "Not configured — set NEXT_PUBLIC_APP_URL"}
                 </span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <span className="text-sm text-gray-600">AI Mode</span>
-                <Badge variant="warning">Mock</Badge>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-sm text-gray-600">Max Upload</span>

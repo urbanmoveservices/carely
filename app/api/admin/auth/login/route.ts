@@ -6,6 +6,11 @@ import { signToken } from "@/lib/jwt";
 import { ok, validationError, unauthorized, fail, forbidden, serverError, rateLimited } from "@/lib/api-response";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 import { auditAdminAction, AUDIT_ACTIONS } from "@/lib/audit-log";
+import {
+  ensureAdminUserFromEnv,
+  envAdminCredentialsMatch,
+  getAdminCredentialsFromEnv,
+} from "@/lib/admin-credentials";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -26,23 +31,33 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, password } = parsed.data;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    const envCreds = getAdminCredentialsFromEnv();
+    let user;
+
+    if (envCreds && envAdminCredentialsMatch(normalizedEmail, password, envCreds)) {
+      user = await ensureAdminUserFromEnv(envCreds);
+    } else if (envCreds) {
       return unauthorized("Invalid credentials");
-    }
+    } else {
+      user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+      if (!user) {
+        return unauthorized("Invalid credentials");
+      }
 
-    if (!user.isActive) {
-      return fail("Account is disabled. Please contact support.", 403);
-    }
+      if (!user.isActive) {
+        return fail("Account is disabled. Please contact support.", 403);
+      }
 
-    const valid = await verifyPassword(password, user.passwordHash);
-    if (!valid) {
-      return unauthorized("Invalid credentials");
-    }
+      const valid = await verifyPassword(password, user.passwordHash);
+      if (!valid) {
+        return unauthorized("Invalid credentials");
+      }
 
-    if (user.role !== "admin") {
-      return forbidden("Admin access required");
+      if (user.role !== "admin") {
+        return forbidden("Admin access required");
+      }
     }
 
     await prisma.user.update({

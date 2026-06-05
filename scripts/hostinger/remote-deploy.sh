@@ -31,6 +31,11 @@ fi
 echo "[1/6] Fetch latest code..."
 git fetch origin "$GIT_BRANCH"
 git checkout "$GIT_BRANCH"
+# next-env.d.ts is rewritten by `next build`; discard local drift so pull succeeds
+if ! git diff --quiet -- next-env.d.ts 2>/dev/null; then
+  echo "      Resetting auto-generated next-env.d.ts before pull..."
+  git checkout -- next-env.d.ts
+fi
 git pull --ff-only origin "$GIT_BRANCH"
 
 echo "[2/6] Install dependencies..."

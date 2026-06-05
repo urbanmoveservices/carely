@@ -1,38 +1,30 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 import { getAppUrl } from "../lib/app-url";
+import {
+  ensureAdminUserFromEnv,
+  getAdminCredentialsFromEnv,
+} from "../lib/admin-credentials";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const name = process.env.ADMIN_NAME || "Carely Admin";
-  const email = process.env.ADMIN_EMAIL || "admin@carelymed.ai";
-  const password = process.env.ADMIN_PASSWORD || "Admin@12345";
+  const creds = getAdminCredentialsFromEnv();
 
-  console.log("\n[CARELY] Creating admin user...\n");
-
-  const existing = await prisma.user.findUnique({ where: { email } });
-
-  if (existing) {
-    if (existing.role === "admin") {
-      console.log(`[CARELY] Admin already exists: ${email}`);
-    } else {
-      await prisma.user.update({
-        where: { email },
-        data: { role: "admin" },
-      });
-      console.log(`[CARELY] User ${email} promoted to admin.`);
-    }
-  } else {
-    const passwordHash = await bcrypt.hash(password, 12);
-    await prisma.user.create({
-      data: { name, email, passwordHash, role: "admin" },
-    });
-    console.log(`[CARELY] Admin user created successfully.`);
+  if (!creds) {
+    console.error(
+      "\n[CARELY] Set ADMIN_EMAIL and ADMIN_PASSWORD in .env before creating admin.\n"
+    );
+    process.exit(1);
   }
 
+  console.log("\n[CARELY] Syncing admin user from environment...\n");
+
+  await ensureAdminUserFromEnv(creds);
+
+  console.log(`[CARELY] Admin user synced from .env.`);
   console.log(`\n  Admin Login:    ${getAppUrl()}/admin/login`);
-  console.log(`  Email:          ${email}`);
+  console.log(`  Email:          ${creds.email}`);
+  console.log(`  Name:           ${creds.name}`);
   console.log(`  Password:       (from .env ADMIN_PASSWORD)\n`);
 }
 
